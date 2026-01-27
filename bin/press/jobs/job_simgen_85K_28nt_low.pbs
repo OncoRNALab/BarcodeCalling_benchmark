@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -N simgen_85K_28nt_low
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=00:30:00
+#PBS -l mem=32gb
+
+module load PyTorch/2.6.0-foss-2024a
+
+cd $PBS_O_WORKDIR
+
+python /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/scripts/2_SimGen_split.py --config /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/config_files/config_benchmark_85K_28nt_sim_low.yaml

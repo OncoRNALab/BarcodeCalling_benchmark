@@ -1,0 +1,14 @@
+{
+    "barcode_file": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_28nt/barcodes_42K_28_subset1",
+    "r1_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_28nt/reads_42K_28_low_R1.fastq",
+    "r2_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_28nt/reads_42K_28_low_R2.fastq",
+    "ground_truth": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_28nt/answers_42K_28_low",
+    "barcode_length": 28,
+    "n_barcodes": 42000,
+    "gpus": 1,
+    "tool": "randombarcodes",
+    "ntriage": 100,
+    "nthresh": 9,
+    "sample_id": "RB_42K_28nt_t100_n9",
+    "outdir": "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/BarCall_benchmark/parameter_sweeps_barcode_count/randombarcodes/42K_28nt/results/t100_n9"
+}

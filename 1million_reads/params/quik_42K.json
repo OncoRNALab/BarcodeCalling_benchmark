@@ -1,0 +1,18 @@
+{
+    "comment": "QUIK parameters for 42K barcodes, 36nt, 1M reads",
+    "tool": "quik",
+    "barcode_file": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/42K_36nt/barcodes_42K_36_subset1",
+    "r1_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/42K_36nt/reads_42K_36_medium_R1.fastq",
+    "r2_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/42K_36nt/reads_42K_36_medium_R2.fastq",
+    "sample_id": "quik_42K_1M",
+    "barcode_length": 36,
+    "outdir": "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/results_1million_reads/quik_42K",
+    "ground_truth": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/42K_36nt/answers_42K_36_medium",
+    
+    "comment_quik": "QUIK-specific parameters",
+    "barcode_start": 0,
+    "strategy": "4_mer_gpu_v4",
+    "distance_measure": "SEQUENCE_LEVENSHTEIN",
+    "rejection_threshold": 8,
+    "gpus": 1
+}

@@ -1,0 +1,24 @@
+{
+    "comment": "Example parameters for RandomBarcodes barcode calling test",
+    "tool": "randombarcodes",
+    "barcode_file": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/21K_28nt/barcodes_21K_28_subset1",
+    "r1_fastq": "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/BarCall_benchmark/test_R1.fastq",
+    "r2_fastq": "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/BarCall_benchmark/test_R2.fastq",
+    "sample_id": "test_21K_28nt_randombarcodes",
+    "barcode_length": 28,
+    "outdir": "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/results/test_21K_28nt_randombarcodes_pbs",
+    "ground_truth": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/21K_28nt/answers_21K_28_low",
+    
+    "comment_randombarcodes": "RandomBarcodes-specific parameters",
+    "n_barcodes": 21000,
+    "ntriage": 1000,
+    "nthresh": 7,
+    "gpus": 2,
+    
+    "comment_note": "QUIK-specific parameters are ignored when tool=randombarcodes",
+    "barcode_start": 0,
+    "strategy": "4_7_mer_gpu_v1",
+    "distance_measure": "SEQUENCE_LEVENSHTEIN",
+    "rejection_threshold": 9
+}
+

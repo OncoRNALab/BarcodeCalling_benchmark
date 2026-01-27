@@ -1,0 +1,26 @@
+{
+  "barcode_file": "/path/to/your/barcodes.txt",
+  "r1_fastq": "/path/to/your/sample_R1.fastq",
+  "r2_fastq": "/path/to/your/sample_R2.fastq",
+  "sample_id": "real_data_sample",
+  "barcode_start": 10,
+  "barcode_length": 36,
+  "tool": "quik",
+  "data_mode": "real",
+  "ground_truth": null,
+  
+  "_comment_quik": "QUIK-specific parameters",
+  "strategy": "4_mer_gpu_v4",
+  "distance_measure": "SEQUENCE_LEVENSHTEIN",
+  "rejection_threshold": 5,
+  
+  "_comment_randombarcodes": "RandomBarcodes-specific parameters",
+  "ntriage": 100,
+  "nthresh": 5,
+  "gpus": 1,
+  
+  "_comment_columba": "Columba-specific parameters",
+  "identity_threshold": 77,
+  "barcode_window": null,
+  "columba_repo": null
+}

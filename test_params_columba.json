@@ -1,0 +1,29 @@
+{
+    "comment": "Example parameters for Columba barcode calling test",
+    "tool": "columba",
+    "barcode_file": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/21K_28nt/barcodes_21K_28_subset1",
+    "r1_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/21K_28nt/reads_21K_28_low_R1.fastq",
+    "r2_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/21K_28nt/reads_21K_28_low_R2.fastq",
+    "sample_id": "test_21K_28nt_columba",
+    "barcode_length": 28,
+    "outdir": "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/results/test_21K_28nt_columba",
+    "ground_truth": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/21K_28nt/answers_21K_28_low",
+    
+    "comment_columba": "Columba-specific parameters",
+    "columba_repo": null,
+    "identity_threshold": 70,
+    "barcode_window": "0-28",
+    
+    "comment_note": "QUIK and RandomBarcodes parameters are ignored when tool=columba",
+    "barcode_start": 0,
+    "strategy": "4_7_mer_gpu_v1",
+    "distance_measure": "SEQUENCE_LEVENSHTEIN",
+    "rejection_threshold": 9,
+    "n_barcodes": 21000,
+    "ntriage": 5000,
+    "nthresh": 3,
+    "gpus": 1
+}
+
+
+

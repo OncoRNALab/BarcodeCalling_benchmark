@@ -1,0 +1,18 @@
+N: 42000 # Number of codewords
+M: 32 # Length of a codeword (nt)
+filename_1: "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/42K_32nt/barcodes_42K_32_subset1" # Output file path for subset 1
+filename_2: "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/42K_32nt/barcodes_42K_32_subset2" # Output file path for subset 2
+picklefilename: "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/42K_32nt/barcodes_42K_32_subset1.pkl" # Pickle file path
+fac: 8
+homomax: 3
+gmax: 0.27
+cyclemax: 2.1
+Q: 1000000 # Number of simulated reads
+nave: 4 # Average Poisson number of reads from each randomly selected codeword
+srate: 0.04 
+irate: 0.05
+drate: 0.14
+readsfilename: "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/42K_32nt/reads_42K_32_placeholder" # Output file path for reads
+answersfilename: "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/42K_32nt/answers_42K_32_placeholder" # Output file path for answers
+Nthresh: 9 # Levenshtein score threshold
+best_path: "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K/42K_32nt/best_42K_32_placeholder.txt"

@@ -1,0 +1,115 @@
+COMPLETE FILE INVENTORY
+=======================
+
+BARCODE GENERATION (15 configs + 15 PBS jobs)
+----------------------------------------------
+
+Count | Length | Config File                              | PBS Job File
+------|--------|------------------------------------------|---------------------------
+85K   | 36nt   | config_benchmark_85K_36nt_bargen.yaml   | job_bargen_85K_36nt.pbs
+85K   | 34nt   | config_benchmark_85K_34nt_bargen.yaml   | job_bargen_85K_34nt.pbs
+85K   | 32nt   | config_benchmark_85K_32nt_bargen.yaml   | job_bargen_85K_32nt.pbs
+85K   | 30nt   | config_benchmark_85K_30nt_bargen.yaml   | job_bargen_85K_30nt.pbs
+85K   | 28nt   | config_benchmark_85K_28nt_bargen.yaml   | job_bargen_85K_28nt.pbs
+42K   | 36nt   | config_benchmark_42K_36nt_bargen.yaml   | job_bargen_42K_36nt.pbs
+42K   | 34nt   | config_benchmark_42K_34nt_bargen.yaml   | job_bargen_42K_34nt.pbs
+42K   | 32nt   | config_benchmark_42K_32nt_bargen.yaml   | job_bargen_42K_32nt.pbs
+42K   | 30nt   | config_benchmark_42K_30nt_bargen.yaml   | job_bargen_42K_30nt.pbs
+42K   | 28nt   | config_benchmark_42K_28nt_bargen.yaml   | job_bargen_42K_28nt.pbs
+21K   | 36nt   | config_benchmark_21K_36nt_bargen.yaml   | job_bargen_21K_36nt.pbs
+21K   | 34nt   | config_benchmark_21K_34nt_bargen.yaml   | job_bargen_21K_34nt.pbs
+21K   | 32nt   | config_benchmark_21K_32nt_bargen.yaml   | job_bargen_21K_32nt.pbs
+21K   | 30nt   | config_benchmark_21K_30nt_bargen.yaml   | job_bargen_21K_30nt.pbs
+21K   | 28nt   | config_benchmark_21K_28nt_bargen.yaml   | job_bargen_21K_28nt.pbs
+
+
+READ SIMULATION (45 configs + 45 PBS jobs)
+-------------------------------------------
+
+Count | Length | Error  | Config File                                  | PBS Job File
+------|--------|--------|----------------------------------------------|--------------------------------
+85K   | 36nt   | low    | config_benchmark_85K_36nt_sim_low.yaml      | job_simgen_85K_36nt_low.pbs
+85K   | 36nt   | medium | config_benchmark_85K_36nt_sim_medium.yaml   | job_simgen_85K_36nt_medium.pbs
+85K   | 36nt   | high   | config_benchmark_85K_36nt_sim_high.yaml     | job_simgen_85K_36nt_high.pbs
+85K   | 34nt   | low    | config_benchmark_85K_34nt_sim_low.yaml      | job_simgen_85K_34nt_low.pbs
+85K   | 34nt   | medium | config_benchmark_85K_34nt_sim_medium.yaml   | job_simgen_85K_34nt_medium.pbs
+85K   | 34nt   | high   | config_benchmark_85K_34nt_sim_high.yaml     | job_simgen_85K_34nt_high.pbs
+85K   | 32nt   | low    | config_benchmark_85K_32nt_sim_low.yaml      | job_simgen_85K_32nt_low.pbs
+85K   | 32nt   | medium | config_benchmark_85K_32nt_sim_medium.yaml   | job_simgen_85K_32nt_medium.pbs
+85K   | 32nt   | high   | config_benchmark_85K_32nt_sim_high.yaml     | job_simgen_85K_32nt_high.pbs
+85K   | 30nt   | low    | config_benchmark_85K_30nt_sim_low.yaml      | job_simgen_85K_30nt_low.pbs
+85K   | 30nt   | medium | config_benchmark_85K_30nt_sim_medium.yaml   | job_simgen_85K_30nt_medium.pbs
+85K   | 30nt   | high   | config_benchmark_85K_30nt_sim_high.yaml     | job_simgen_85K_30nt_high.pbs
+85K   | 28nt   | low    | config_benchmark_85K_28nt_sim_low.yaml      | job_simgen_85K_28nt_low.pbs
+85K   | 28nt   | medium | config_benchmark_85K_28nt_sim_medium.yaml   | job_simgen_85K_28nt_medium.pbs
+85K   | 28nt   | high   | config_benchmark_85K_28nt_sim_high.yaml     | job_simgen_85K_28nt_high.pbs
+42K   | 36nt   | low    | config_benchmark_42K_36nt_sim_low.yaml      | job_simgen_42K_36nt_low.pbs
+42K   | 36nt   | medium | config_benchmark_42K_36nt_sim_medium.yaml   | job_simgen_42K_36nt_medium.pbs
+42K   | 36nt   | high   | config_benchmark_42K_36nt_sim_high.yaml     | job_simgen_42K_36nt_high.pbs
+42K   | 34nt   | low    | config_benchmark_42K_34nt_sim_low.yaml      | job_simgen_42K_34nt_low.pbs
+42K   | 34nt   | medium | config_benchmark_42K_34nt_sim_medium.yaml   | job_simgen_42K_34nt_medium.pbs
+42K   | 34nt   | high   | config_benchmark_42K_34nt_sim_high.yaml     | job_simgen_42K_34nt_high.pbs
+42K   | 32nt   | low    | config_benchmark_42K_32nt_sim_low.yaml      | job_simgen_42K_32nt_low.pbs
+42K   | 32nt   | medium | config_benchmark_42K_32nt_sim_medium.yaml   | job_simgen_42K_32nt_medium.pbs
+42K   | 32nt   | high   | config_benchmark_42K_32nt_sim_high.yaml     | job_simgen_42K_32nt_high.pbs
+42K   | 30nt   | low    | config_benchmark_42K_30nt_sim_low.yaml      | job_simgen_42K_30nt_low.pbs
+42K   | 30nt   | medium | config_benchmark_42K_30nt_sim_medium.yaml   | job_simgen_42K_30nt_medium.pbs
+42K   | 30nt   | high   | config_benchmark_42K_30nt_sim_high.yaml     | job_simgen_42K_30nt_high.pbs
+42K   | 28nt   | low    | config_benchmark_42K_28nt_sim_low.yaml      | job_simgen_42K_28nt_low.pbs
+42K   | 28nt   | medium | config_benchmark_42K_28nt_sim_medium.yaml   | job_simgen_42K_28nt_medium.pbs
+42K   | 28nt   | high   | config_benchmark_42K_28nt_sim_high.yaml     | job_simgen_42K_28nt_high.pbs
+21K   | 36nt   | low    | config_benchmark_21K_36nt_sim_low.yaml      | job_simgen_21K_36nt_low.pbs
+21K   | 36nt   | medium | config_benchmark_21K_36nt_sim_medium.yaml   | job_simgen_21K_36nt_medium.pbs
+21K   | 36nt   | high   | config_benchmark_21K_36nt_sim_high.yaml     | job_simgen_21K_36nt_high.pbs
+21K   | 34nt   | low    | config_benchmark_21K_34nt_sim_low.yaml      | job_simgen_21K_34nt_low.pbs
+21K   | 34nt   | medium | config_benchmark_21K_34nt_sim_medium.yaml   | job_simgen_21K_34nt_medium.pbs
+21K   | 34nt   | high   | config_benchmark_21K_34nt_sim_high.yaml     | job_simgen_21K_34nt_high.pbs
+21K   | 32nt   | low    | config_benchmark_21K_32nt_sim_low.yaml      | job_simgen_21K_32nt_low.pbs
+21K   | 32nt   | medium | config_benchmark_21K_32nt_sim_medium.yaml   | job_simgen_21K_32nt_medium.pbs
+21K   | 32nt   | high   | config_benchmark_21K_32nt_sim_high.yaml     | job_simgen_21K_32nt_high.pbs
+21K   | 30nt   | low    | config_benchmark_21K_30nt_sim_low.yaml      | job_simgen_21K_30nt_low.pbs
+21K   | 30nt   | medium | config_benchmark_21K_30nt_sim_medium.yaml   | job_simgen_21K_30nt_medium.pbs
+21K   | 30nt   | high   | config_benchmark_21K_30nt_sim_high.yaml     | job_simgen_21K_30nt_high.pbs
+21K   | 28nt   | low    | config_benchmark_21K_28nt_sim_low.yaml      | job_simgen_21K_28nt_low.pbs
+21K   | 28nt   | medium | config_benchmark_21K_28nt_sim_medium.yaml   | job_simgen_21K_28nt_medium.pbs
+21K   | 28nt   | high   | config_benchmark_21K_28nt_sim_high.yaml     | job_simgen_21K_28nt_high.pbs
+
+
+TOTAL FILES GENERATED
+----------------------
+Barcode generation configs: 15
+Simulation configs:         45
+Total config files:         60
+
+Barcode generation PBS:     15
+Simulation PBS:             45
+Total PBS job files:        60
+
+Output directories:         15
+Helper scripts:             5
+Documentation files:        3
+
+GRAND TOTAL:                143 files/directories created
+
+
+OUTPUT FILE STRUCTURE
+---------------------
+
+For each of the 15 barcode sets, the following files will be generated:
+
+Example for 85K_36nt:
+  outputs/benchmark_85K_42K_21K/85K_36nt/
+  ├── barcodes_85K_36_subset1         (barcode generation)
+  ├── barcodes_85K_36_subset2         (barcode generation)
+  ├── barcodes_85K_36_subset1.pkl     (barcode generation)
+  ├── reads_85K_36_low                (simulation - low error)
+  ├── answers_85K_36_low              (simulation - low error)
+  ├── best_85K_36_low.txt             (simulation - low error)
+  ├── reads_85K_36_medium             (simulation - medium error)
+  ├── answers_85K_36_medium           (simulation - medium error)
+  ├── best_85K_36_medium.txt          (simulation - medium error)
+  ├── reads_85K_36_high               (simulation - high error)
+  ├── answers_85K_36_high             (simulation - high error)
+  └── best_85K_36_high.txt            (simulation - high error)
+
+Total expected output files: 15 × 12 = 180 files

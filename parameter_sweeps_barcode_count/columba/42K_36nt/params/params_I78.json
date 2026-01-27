@@ -1,0 +1,13 @@
+{
+    "tool": "columba",
+    "barcode_file": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_36nt/barcodes_42K_36_subset1",
+    "r1_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_36nt/reads_42K_36_low_R1.fastq",
+    "r2_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_36nt/reads_42K_36_low_R2.fastq",
+    "ground_truth": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_36nt/answers_42K_36_low",
+    "barcode_length": 36,
+    "barcode_window": "0-36",
+    "columba_repo": "/user/gent/446/vsc44685/ScratchVO_dir/columba",
+    "identity_threshold": 78,
+    "sample_id": "Columba_42K_36nt_I78",
+    "outdir": "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/BarCall_benchmark/parameter_sweeps_barcode_count/columba/42K_36nt/results/I78"
+}

@@ -1,0 +1,25 @@
+name: randombarcodes
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Python version
+  - python=3.11
+  
+  # Core scientific computing
+  - numpy>=1.24
+  
+  # PyTorch with CUDA support (required for GPU acceleration)
+  - pytorch>=2.0
+  - pytorch-cuda=11.8
+  - torchvision
+  - torchaudio
+  
+  # Optional: useful for development and debugging
+  - pandas
+  
+  # Note: gzip, csv, argparse, subprocess, re are built-in Python modules
+

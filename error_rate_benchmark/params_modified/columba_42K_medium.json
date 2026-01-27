@@ -1,0 +1,16 @@
+{
+    "comment": "Columba parameters for 42K barcodes, 36nt, medium error rate (Modified: identity_threshold=83)",
+    "tool": "columba",
+    "barcode_file": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_36nt/barcodes_42K_36_subset1",
+    "r1_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_36nt/reads_42K_36_medium_R1.fastq",
+    "r2_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_36nt/reads_42K_36_medium_R2.fastq",
+    "sample_id": "columba_42K_36nt_medium_mod",
+    "barcode_length": 36,
+    "outdir": "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/BarCall_benchmark/error_rate_benchmark/results_modified/columba_42K_36nt_medium",
+    "ground_truth": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/42K_36nt/answers_42K_36_medium",
+    "comment_columba": "Columba-specific parameters",
+    "columba_repo": "/user/gent/446/vsc44685/ScratchVO_dir/columba",
+    "identity_threshold": 83,
+    "barcode_window": "0-36",
+    "cpus": 16
+}

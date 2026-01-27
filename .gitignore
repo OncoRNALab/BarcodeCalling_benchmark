@@ -1,0 +1,50 @@
+# Nextflow runtime + caches
+.nextflow*
+work/
+work_*/
+work-*/
+**/.command.*
+**/.commandbegin
+**/.commandlog
+**/.commandout
+**/.commanderr
+**/.exitcode
+**/trace*.txt
+**/timeline*.html
+**/report*.html
+**/dag*.html
+**/dag*.svg
+
+# Benchmark outputs (large / regenerated)
+**/results*/
+**/logs*/
+**/*.out
+**/*.err
+
+# Large sequencing/alignment files
+**/*.sam
+**/*.bam
+**/*.fastq
+**/*.fastq.gz
+**/*.fq
+**/*.fq.gz
+
+# Tool build artifacts / indexes
+**/columba_index/
+**/columba_build/
+**/quik/build/
+**/*.brt
+**/*.bwt
+**/*.cct
+**/*.fsid
+**/*.meta
+**/*.pos
+**/*.rev.brt
+**/*.sa.*
+**/*.sna
+**/*.txt.bin
+**/*.headerSN.bin
+
+# Python artifacts
+__pycache__/
+*.pyc

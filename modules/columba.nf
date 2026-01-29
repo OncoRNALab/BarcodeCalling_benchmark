@@ -4,9 +4,8 @@ process COLUMBA_BUILD {
     tag "columba_build"
     label 'process_medium'
     
-    // Conda environment for LOCAL execution
+    // Container for local,singularity profile
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
-    conda "${moduleDir}/../envs/columba.yml"
     container "${moduleDir}/../containers_backup/columba_build.sif"
     
     publishDir "${params.outdir}/columba_build", mode: 'copy'
@@ -23,38 +22,47 @@ process COLUMBA_BUILD {
     
     script:
     """
-    # Determine source directory
-    if [ -d "${columba_repo}" ]; then
-        echo "Using provided Columba repository: ${columba_repo}"
-        REPO_DIR="\$(readlink -f ${columba_repo})"
-        # Check if already built
-        if [ -d "\${REPO_DIR}/build_Vanilla" ] && [ -f "\${REPO_DIR}/build_Vanilla/columba" ] && [ -f "\${REPO_DIR}/build_Vanilla/columba_build" ]; then
-            echo "Found existing build_Vanilla directory with binaries - skipping build"
-            NEED_BUILD=false
+    # Check if running in container (pre-built binaries available)
+    if [ -f "/opt/columba/build_Vanilla/columba" ] && [ -f "/opt/columba/build_Vanilla/columba_build" ]; then
+        echo "Running in Singularity container - using pre-built Columba binaries"
+        cp -rL /opt/columba/build_Vanilla ./
+        echo "Container binaries copied successfully"
+    else
+        # Running on SLURM with HPC modules - use external repository
+        echo "Running with HPC modules - using external Columba repository"
+        if [ -d "${columba_repo}" ]; then
+            echo "Using provided Columba repository: ${columba_repo}"
+            REPO_DIR="\$(readlink -f ${columba_repo})"
+            # Check if already built
+            if [ -d "\${REPO_DIR}/build_Vanilla" ] && [ -f "\${REPO_DIR}/build_Vanilla/columba" ] && [ -f "\${REPO_DIR}/build_Vanilla/columba_build" ]; then
+                echo "Found existing build_Vanilla directory with binaries - skipping build"
+                NEED_BUILD=false
+            else
+                echo "No existing build found - will build"
+                NEED_BUILD=true
+            fi
         else
-            echo "No existing build found - will build"
-            NEED_BUILD=true
+            echo "ERROR: No Columba repository provided and not running in container"
+            echo "Please provide columba_repo parameter when using SLURM profile"
+            exit 1
         fi
-    else
-        echo "Cloning Columba repository..."
-        git clone git@github.com:biointec/columba.git
-        REPO_DIR="\$(pwd)/columba"
-        NEED_BUILD=true
+        # Build Columba only if needed
+        if [ "\$NEED_BUILD" = "true" ]; then
+            echo "Building Columba in \${REPO_DIR}..."
+            cd "\${REPO_DIR}"
+            bash build_script.sh Vanilla
+            cd -
+        else
+            echo "Using existing Columba binaries from \${REPO_DIR}"
+        fi
+        # Copy build directory to output location
+        echo "Copying binaries from \${REPO_DIR}/build_Vanilla to ./build_Vanilla"
+        cp -rL "\${REPO_DIR}/build_Vanilla" ./
     fi
-    # Build Columba only if needed
-    if [ "\$NEED_BUILD" = "true" ]; then
-        echo "Building Columba in \${REPO_DIR}..."
-        cd "\${REPO_DIR}"
-        bash build_script.sh Vanilla
-        cd -
-    else
-        echo "Using existing Columba binaries from \${REPO_DIR}"
-    fi
-    # Copy build directory to output location
-    echo "Copying binaries from \${REPO_DIR}/build_Vanilla to ./build_Vanilla"
-    cp -rL "\${REPO_DIR}/build_Vanilla" ./
+    
     # Verify binaries exist
     ls -lh build_Vanilla/columba*
+    
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         columba: \$(./build_Vanilla/columba --version 2>&1 | head -1 || echo "unknown")
@@ -78,9 +86,8 @@ process COLUMBA_INDEX {
     tag "$meta.id"
     label 'process_medium'
     
-    // Conda environment for LOCAL execution
+    // Container for local,singularity profile
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
-    conda "${moduleDir}/../envs/columba.yml"
     container "${moduleDir}/../containers_backup/columba_build.sif"
     
     publishDir "${params.outdir}/${meta.id}/columba_index", mode: 'copy'
@@ -127,9 +134,8 @@ process COLUMBA_ALIGN {
     tag "$meta.id"
     label 'process_high'
     
-    // Conda environment for LOCAL execution
+    // Container for local,singularity profile
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
-    conda "${moduleDir}/../envs/columba.yml"
     container "${moduleDir}/../containers_backup/columba_build.sif"
     
     publishDir "${params.outdir}/${meta.id}", mode: 'copy'

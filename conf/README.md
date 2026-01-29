@@ -38,38 +38,24 @@ This directory contains modular configuration files for the Barcode Calling Benc
 
 ## Usage Examples
 
-### Local Execution with Conda
+### Local Execution with Singularity (Recommended for Testing)
 ```bash
-nextflow run main.nf -profile conda -params-file params.json
-```
-- Local executor
-- Pure conda environments (no HPC modules)
-- Best for development and testing
-
-### Local Execution with Singularity
-```bash
-nextflow run main.nf -profile singularity,local -params-file params.json
+nextflow run main.nf -profile local,singularity -params-file params.json
 ```
 - Local executor
 - Singularity containers with GPU support (`--nv`)
-- Good for reproducibility
+- Columba uses pre-built container (no `columba_repo` parameter needed)
+- Best for development, testing, and reproducibility
 
-### SLURM with HPC Modules (Recommended for HPC)
+### SLURM with HPC Modules (Recommended for HPC Production)
 ```bash
 nextflow run main.nf -profile slurm -params-file params.json
 ```
 - SLURM scheduler
 - Loads optimized HPC modules (PyTorch-bundle, CMake, GCCcore)
 - GPU allocation via `--gres=gpu:N`
-- RandomBarcodes and Columba use HPC modules instead of conda
-
-### SLURM with Conda (Alternative)
-```bash
-nextflow run main.nf -profile conda,slurm -params-file params.json
-```
-- SLURM scheduler
-- Uses conda environments for all tools
-- Slower than HPC modules but more portable
+- RandomBarcodes and Columba use HPC modules
+- **Columba requires `columba_repo` parameter in JSON**
 
 ---
 
@@ -100,25 +86,32 @@ Where are you running?
 
 ## Environment Management
 
-### RandomBarcodes & Columba
+### Tool-Specific Execution Modes
 
-**Profile-dependent behavior:**
+| Tool | `local,singularity` | `slurm` |
+|------|---------------------|---------|
+| **RandomBarcodes** | Container (pytorch/pytorch:2.1.0) | HPC modules (PyTorch-bundle + CUDA) |
+| **QUIK** | Conda (`envs/quik_minimal.yml`) | Conda (`envs/quik_minimal.yml`) |
+| **Columba** | **Container (columba_build.sif)** | **HPC modules (CMake + GCCcore)** |
 
-| Profile | RandomBarcodes | Columba |
-|---------|----------------|---------|
-| `slurm` | HPC modules (PyTorch-bundle + CUDA) | HPC modules (CMake + GCCcore) |
-| `conda,slurm` | Conda (`envs/randombarcodes.yml`) | Conda (`envs/columba.yml`) |
-| `conda` | Conda (`envs/randombarcodes.yml`) | Conda (`envs/columba.yml`) |
-| `singularity,local` | Container (pytorch/pytorch:2.1.0) | Conda (`envs/columba.yml`) |
+### Columba-Specific Behavior
+
+**Critical difference:**
+- **`local,singularity`**: Uses pre-built binaries from container at `/opt/columba/build_Vanilla/`
+  - No `columba_repo` parameter needed
+  - No compilation required
+  - Fully portable
+  
+- **`slurm`**: Builds/uses external Columba repository
+  - **Requires `columba_repo` parameter** in JSON pointing to cloned repository
+  - Uses HPC modules for compilation/execution
+  - Optimized for HPC performance
 
 **Implementation:**
-- Module files contain conda directives for local execution
-- `slurm.config` overrides conda directives to `null` and loads HPC modules
-- Ensures optimized builds on HPC, portable environments elsewhere
-
-### QUIK
-
-**Always uses conda** (`envs/quik_minimal.yml`) - builds from source in all environments.
+- `COLUMBA_BUILD` process detects container execution
+- If `/opt/columba/build_Vanilla/` exists (container), copies pre-built binaries
+- Otherwise, uses external repository (SLURM with modules)
+- `slurm.config` overrides container directive to `null` and loads HPC modules
 
 ---
 

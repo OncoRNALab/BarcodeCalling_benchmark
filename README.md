@@ -19,17 +19,35 @@ The benchmarks evaluate accuracy (precision/recall), runtime, and scalability ac
 
 ### Essential
 - **Nextflow** ≥ 23.04 ([install guide](https://www.nextflow.io/docs/latest/getstarted.html))
-- **Conda** or **Singularity** (for dependency management)
-- **SLURM** (if running on HPC) or local execution
+- **Singularity/Apptainer** (for local execution with containers)
+- **SLURM** (for HPC execution with modules)
 
-### Conda environments
-All tool-specific dependencies are provided as environment YML files in `envs/`. Nextflow will automatically create and activate them when using `-profile conda` or `-profile singularity`.
+### Tool-Specific Requirements
 
-### Manual tool installation (optional)
-If not using containers/conda, you can install:
-- **QUIK**: build from source (see `bin/quik/README.md`)
-- **RandomBarcodes**: Python + PyTorch + CUDA ([see Press 2022](https://github.com/...))
-- **Columba**: clone and build from [Columba repo](https://github.com/biointec/columba)
+#### QUIK & RandomBarcodes
+- Conda environments provided in `envs/`
+- Containers available for Singularity execution
+- Nextflow handles dependency management automatically
+
+#### Columba
+**Two execution modes:**
+
+**1. Local execution with Singularity** (`-profile local,singularity`)
+- Uses pre-built container: `containers_backup/columba_build.sif`
+- **No manual installation required** - binaries are inside the container
+- **No `columba_repo` parameter needed**
+
+**2. HPC execution with SLURM** (`-profile slurm`)
+- Requires manual Columba installation
+- Clone and build Columba from source:
+  ```bash
+  cd /path/to/your/software
+  git clone https://github.com/biointec/columba.git
+  cd columba
+  bash build_script.sh Vanilla
+  ```
+- **Must provide `columba_repo` parameter** in JSON files pointing to the cloned directory
+- Pipeline uses HPC modules (CMake/GCCcore) for compilation
 
 ## Data Download (Zenodo)
 
@@ -176,11 +194,46 @@ bash barcode_seq/submit_all_tools.sh
 
 ### Profiles
 
-- **`-profile slurm`**: For HPC with SLURM scheduler
-- **`-profile local`**: For local execution
-- **`-profile conda`**: Use Conda for dependencies
-- **`-profile singularity`**: Use Singularity containers
-- **Combined**: `-profile slurm,conda` or `-profile local,singularity`
+The pipeline supports two main execution modes:
+
+#### 1. Local execution with Singularity (`-profile local,singularity`)
+- Uses Singularity containers for all tools
+- **Recommended for testing and reproducibility**
+- Columba uses pre-built container (no `columba_repo` needed)
+- Example:
+  ```bash
+  nextflow run main.nf \
+      --tool columba \
+      --barcode_file data/barcodes.fasta \
+      --r1_fastq data/reads_R1.fastq \
+      --r2_fastq data/reads_R2.fastq \
+      --sample_id test_columba \
+      --identity_threshold 80 \
+      --outdir results/test \
+      -profile local,singularity
+  ```
+
+#### 2. HPC execution with SLURM (`-profile slurm`)
+- Uses SLURM scheduler with HPC modules
+- **Recommended for production benchmarks on HPC clusters**
+- Columba requires `columba_repo` parameter (path to cloned repository)
+- Example:
+  ```bash
+  nextflow run main.nf \
+      --tool columba \
+      --barcode_file data/barcodes.fasta \
+      --r1_fastq data/reads_R1.fastq \
+      --r2_fastq data/reads_R2.fastq \
+      --sample_id test_columba \
+      --identity_threshold 80 \
+      --columba_repo /path/to/columba \
+      --outdir results/test \
+      -profile slurm
+  ```
+
+**Note for Columba users:**
+- `local,singularity`: Container binaries used automatically (no setup needed)
+- `slurm`: Must download and provide `columba_repo` parameter (see Software Requirements)
 
 See `conf/` for detailed configuration options.
 

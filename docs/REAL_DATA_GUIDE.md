@@ -10,7 +10,7 @@ The pipeline now supports two modes:
 
 ## Quick Start - Real Data
 
-### Basic Command
+### Basic Command - Local Execution with Singularity
 
 ```bash
 nextflow run main.nf \
@@ -21,13 +21,33 @@ nextflow run main.nf \
     --sample_id my_sample \
     --barcode_length 36 \
     --data_mode real \
-    --outdir results/
+    --outdir results/ \
+    -profile local,singularity
+```
+
+### Basic Command - HPC Execution with SLURM
+
+```bash
+nextflow run main.nf \
+    --tool quik \
+    --barcode_file barcodes.txt \
+    --r1_fastq sample_R1.fastq \
+    --r2_fastq sample_R2.fastq \
+    --sample_id my_sample \
+    --barcode_length 36 \
+    --data_mode real \
+    --outdir results/ \
+    -profile slurm
 ```
 
 ### Using a Parameters File
 
 ```bash
-nextflow run main.nf -params-file test_params_real_data.json
+# Local with Singularity
+nextflow run main.nf -params-file test_params_real_data.json -profile local,singularity
+
+# HPC with SLURM
+nextflow run main.nf -params-file test_params_real_data.json -profile slurm
 ```
 
 ## Parameters

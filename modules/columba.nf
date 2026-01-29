@@ -4,9 +4,9 @@ process COLUMBA_BUILD {
     tag "columba_build"
     label 'process_medium'
     
-    beforeScript 'module load CMake/3.29.3-GCCcore-13.3.0 2>/dev/null || true'
-    
-    conda "${moduleDir}/../envs/python_basic.yml"
+    // Conda environment for LOCAL execution
+    // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
+    conda "${moduleDir}/../envs/columba.yml"
     
     publishDir "${params.outdir}/columba_build", mode: 'copy'
     
@@ -77,9 +77,9 @@ process COLUMBA_INDEX {
     tag "$meta.id"
     label 'process_medium'
     
-    beforeScript 'module load GCCcore/13.3.0 2>/dev/null || true'
-    
-    conda "${moduleDir}/../envs/python_basic.yml"
+    // Conda environment for LOCAL execution
+    // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
+    conda "${moduleDir}/../envs/columba.yml"
     
     publishDir "${params.outdir}/${meta.id}/columba_index", mode: 'copy'
     
@@ -125,9 +125,9 @@ process COLUMBA_ALIGN {
     tag "$meta.id"
     label 'process_high'
     
-    beforeScript 'module load GCCcore/13.3.0 2>/dev/null || true'
-    
-    conda "${moduleDir}/../envs/python_basic.yml"
+    // Conda environment for LOCAL execution
+    // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
+    conda "${moduleDir}/../envs/columba.yml"
     
     publishDir "${params.outdir}/${meta.id}", mode: 'copy'
     

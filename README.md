@@ -33,9 +33,10 @@ The benchmarks evaluate accuracy (precision/recall), runtime, and scalability ac
 **Two execution modes:**
 
 **1. Local execution with Singularity** (`-profile local,singularity`)
-- Uses pre-built container: `containers_backup/columba_build.sif`
-- **No manual installation required** - binaries are inside the container
+- Uses pre-built container from Quay.io: `oras://quay.io/francoaps/columba_vanilla:latest`
+- **No manual installation required** - container is automatically pulled and cached
 - **No `columba_repo` parameter needed**
+- Container includes Columba 2.0.3 with all dependencies
 
 **2. HPC execution with SLURM** (`-profile slurm`)
 - Requires manual Columba installation

@@ -6,7 +6,7 @@ process COLUMBA_BUILD {
     
     // Container for local,singularity profile
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
-    container "${moduleDir}/../containers_backup/columba_build.sif"
+    container "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/containers_backup/columba_build.sif"
     
     publishDir "${params.outdir}/columba_build", mode: 'copy'
     
@@ -88,7 +88,7 @@ process COLUMBA_INDEX {
     
     // Container for local,singularity profile
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
-    container "${moduleDir}/../containers_backup/columba_build.sif"
+    container "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/containers_backup/columba_build.sif"
     
     publishDir "${params.outdir}/${meta.id}/columba_index", mode: 'copy'
     
@@ -136,7 +136,7 @@ process COLUMBA_ALIGN {
     
     // Container for local,singularity profile
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
-    container "${moduleDir}/../containers_backup/columba_build.sif"
+    container "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/containers_backup/columba_build.sif"
     
     publishDir "${params.outdir}/${meta.id}", mode: 'copy'
     

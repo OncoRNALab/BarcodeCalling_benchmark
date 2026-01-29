@@ -127,15 +127,22 @@ Each benchmark has a **generator script** in `bin/` that creates all job submiss
 
 ## Benchmark Reproduction
 
+**IMPORTANT**: All generator scripts create job submission files with relative paths. You must be in the **project root directory** when submitting jobs to SLURM:
+
+```bash
+cd /path/to/BarCall_benchmark  # Always run from project root!
+sbatch error_rate_benchmark/jobs/some_job.sh
+```
+
 ### Error-Rate Benchmark (3 tools × 3 barcode counts × 3 error rates = 27 runs)
 
 ```bash
-# 1. Generate jobs and params
+# 1. Generate jobs and params (from project root)
 python3 bin/generate_jobs_and_params_error_rate.py \
     --data-dir data/benchmark_85K_42K_21K_200K \
     --results-dir results/error_rate
 
-# 2. Submit all jobs
+# 2. Submit all jobs (from project root)
 bash error_rate_benchmark/submit_all_error_rate_benchmarks.sh
 
 # 3. Analyze results (see notebooks/)

@@ -4,9 +4,9 @@ process COLUMBA_BUILD {
     tag "columba_build"
     label 'process_medium'
     
-    // Container for local,singularity profile
+    // Container for local,singularity profile (pulled from Quay.io registry)
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
-    container "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/containers_backup/columba_build.sif"
+    container "oras://quay.io/francoaps/columba_vanilla:latest"
     
     publishDir "${params.outdir}/columba_build", mode: 'copy'
     
@@ -86,9 +86,9 @@ process COLUMBA_INDEX {
     tag "$meta.id"
     label 'process_medium'
     
-    // Container for local,singularity profile
+    // Container for local,singularity profile (pulled from Quay.io registry)
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
-    container "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/containers_backup/columba_build.sif"
+    container "oras://quay.io/francoaps/columba_vanilla:latest"
     
     publishDir "${params.outdir}/${meta.id}/columba_index", mode: 'copy'
     
@@ -134,9 +134,9 @@ process COLUMBA_ALIGN {
     tag "$meta.id"
     label 'process_high'
     
-    // Container for local,singularity profile
+    // Container for local,singularity profile (pulled from Quay.io registry)
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
-    container "/user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/containers_backup/columba_build.sif"
+    container "oras://quay.io/francoaps/columba_vanilla:latest"
     
     publishDir "${params.outdir}/${meta.id}", mode: 'copy'
     

@@ -1,258 +1,253 @@
-# Barcode Calling Benchmark Pipeline
+# BarCall_benchmark: Barcode Calling Benchmark Pipeline
+
+Reproducible benchmarking workflow for evaluating DNA barcode calling tools under high error rates.
 
 ## Overview
 
-A Nextflow-based pipeline for benchmarking DNA barcode calling algorithms on simulated and real sequencing data. The pipeline supports multiple barcode calling tools and provides comprehensive performance metrics.
+This repository provides a **Nextflow-based pipeline** to benchmark three barcode calling methods:
+- **RandomBarcodes** (Press 2022) — trimer-statistics triage with GPU acceleration
+- **QUIK** (Uphoff et al. 2026) — k-mer filtering with GPU acceleration  
+- **Columba** (Renders et al. 2024) — lossless approximate matching using FM-index search schemes
 
-## Supported Tools
+The benchmarks evaluate accuracy (precision/recall), runtime, and scalability across:
+- Multiple barcode lengths (28–36 nt)
+- Multiple barcode library sizes (21k, 42k, 85k)
+- Multiple error regimes (low, medium, high)
+- Simulated and real sequencing data
 
-- **QUIK**: GPU-accelerated barcode calling using C++/CUDA
-- **RandomBarcodes** (Press et al.): Python/PyTorch-based GPU barcode calling
-- **Columba**: Coming soon
+## Software Requirements
 
-## Features
+### Essential
+- **Nextflow** ≥ 23.04 ([install guide](https://www.nextflow.io/docs/latest/getstarted.html))
+- **Conda** or **Singularity** (for dependency management)
+- **SLURM** (if running on HPC) or local execution
 
-- ✅ Multi-tool support with easy tool selection
-- ✅ **Real data support** - Run without ground truth for real sequencing data
-- ✅ Automated precision/recall calculation against ground truth (simulated data)
-- ✅ **Comprehensive statistics** - Assignment rates, distribution metrics, quality indicators
-- ✅ GPU-accelerated processing
-- ✅ Modular design for easy extension
-- ✅ Multiple execution profiles (local, PBS, SLURM)
-- ✅ Comprehensive statistics and reporting
+### Conda environments
+All tool-specific dependencies are provided as environment YML files in `envs/`. Nextflow will automatically create and activate them when using `-profile conda` or `-profile singularity`.
 
-## Data Modes
+### Manual tool installation (optional)
+If not using containers/conda, you can install:
+- **QUIK**: build from source (see `bin/quik/README.md`)
+- **RandomBarcodes**: Python + PyTorch + CUDA ([see Press 2022](https://github.com/...))
+- **Columba**: clone and build from [Columba repo](https://github.com/biointec/columba)
 
-### Simulated Data (with Ground Truth)
-- Full precision/recall/accuracy metrics
-- Per-barcode error analysis
-- Optimal threshold identification
+## Data Download (Zenodo)
 
-### Real Data (without Ground Truth) **NEW**
-- Assignment rate analysis
-- Barcode distribution statistics
-- Coverage uniformity metrics
-- Quality indicators (singletons, low coverage)
-- Per-barcode read counts
+All benchmark datasets are deposited at **Zenodo DOI: [10.5281/zenodo.18387161](https://doi.org/10.5281/zenodo.18387161)**
 
-See [REAL_DATA_GUIDE.md](docs/REAL_DATA_GUIDE.md) for detailed instructions.
+### Download and extract
+
+```bash
+# Create data directory
+mkdir -p data/
+
+# Download simulated data (200k reads)
+wget https://zenodo.org/record/18387161/files/benchmark_85K_42K_21K_200K.tar.gz -O data/benchmark_200K.tar.gz
+tar -xzf data/benchmark_200K.tar.gz -C data/
+
+# Download simulated data (1M reads)
+wget https://zenodo.org/record/18387161/files/benchmark_85K_42K_21K.tar.gz -O data/benchmark_1M.tar.gz
+tar -xzf data/benchmark_1M.tar.gz -C data/
+
+# Download real sequencing data
+cd data/
+wget https://zenodo.org/record/18387161/files/Munchen_25024_1in4_S4_L001_R1_001.fastq.gz
+wget https://zenodo.org/record/18387161/files/Munchen_25024_1in4_S4_L001_R2_001.fastq.gz
+wget https://zenodo.org/record/18387161/files/Munchen_25024_1in2_S1_L001_R1_001.fastq.gz
+wget https://zenodo.org/record/18387161/files/Munchen_25024_1in2_S1_L001_R2_001.fastq.gz
+wget https://zenodo.org/record/18387161/files/Munchen_25024_1in1_S2_L001_R1_001.fastq.gz
+wget https://zenodo.org/record/18387161/files/Munchen_25024_1in1_S2_L001_R2_001.fastq.gz
+cd ..
+
+# (Optional) Download barcode references for real data if not included in benchmark archives
+```
+
+### Expected directory structure after extraction
+
+```
+data/
+├── benchmark_85K_42K_21K_200K/     # 200k simulated reads
+│   ├── 21K_28nt/
+│   │   ├── barcodes_21K_28_subset1
+│   │   ├── answers_21K_28_low
+│   │   ├── reads_21K_28_low_R1.fastq
+│   │   └── reads_21K_28_low_R2.fastq
+│   ├── 21K_36nt/
+│   ├── 42K_28nt/
+│   ├── ...
+│   └── 85K_36nt/
+├── benchmark_85K_42K_21K/          # 1M simulated reads
+│   ├── 21K_36nt/
+│   ├── 42K_36nt/
+│   └── 85K_36nt/
+└── Munchen_*.fastq.gz              # Real sequencing data
+```
 
 ## Quick Start
 
-### Running QUIK
+### 1. Test the pipeline (single run)
 
 ```bash
+# Example: Run QUIK on 21K 36nt barcodes
 nextflow run main.nf \
-    -profile vsc_conda \
-    -params-file test_params.json \
-    --tool quik
+    --tool quik \
+    --barcode_file data/benchmark_85K_42K_21K_200K/21K_36nt/barcodes_21K_36_subset1 \
+    --r1_fastq data/benchmark_85K_42K_21K_200K/21K_36nt/reads_21K_36_low_R1.fastq \
+    --r2_fastq data/benchmark_85K_42K_21K_200K/21K_36nt/reads_21K_36_low_R2.fastq \
+    --ground_truth data/benchmark_85K_42K_21K_200K/21K_36nt/answers_21K_36_low \
+    --sample_id test_quik_21K \
+    --strategy 4_mer_gpu_v4 \
+    --rejection_threshold 8 \
+    --outdir results/test \
+    -profile slurm
 ```
 
-### Running RandomBarcodes
+### 2. Reproduce full benchmarks
+
+Each benchmark has a **generator script** in `bin/` that creates all job submission files and parameter JSONs.
+
+## Benchmark Reproduction
+
+### Error-Rate Benchmark (3 tools × 3 barcode counts × 3 error rates = 27 runs)
 
 ```bash
-nextflow run main.nf \
-    -profile vsc_conda \
-    -params-file test_params_randombarcodes.json \
-    --tool randombarcodes
+# 1. Generate jobs and params
+python3 bin/generate_jobs_and_params_error_rate.py \
+    --data-dir data/benchmark_85K_42K_21K_200K \
+    --results-dir results/error_rate
+
+# 2. Submit all jobs
+bash error_rate_benchmark/submit_all_error_rate_benchmarks.sh
+
+# 3. Analyze results (see notebooks/)
 ```
 
-See [TOOL_SELECTION.md](docs/TOOL_SELECTION.md) for detailed usage instructions.
-
----
-
-# Precision Calculation Module
-
-The pipeline includes a precision calculation module that compares barcode calling results against ground truth data. This is designed for evaluating barcode calling performance on simulated datasets.
-
-## Input Requirements
-
-### 1. Ground Truth File
-- **Format**: Plain text file with one barcode index per line
-- **Content**: Each line contains an integer representing the barcode index (0-based)
-- **Example**: For 1 million simulated reads, the file will have 1 million lines
-- **Location**: `/path/to/ground_truth.txt`
-
-```
-21254
-21254
-7343
-4711
-...
-```
-
-### 2. Barcode Reference File
-- **Format**: Plain text file with one barcode sequence per line
-- **Example**:
-```
-ataataaatgagtgggataataaatgagt  # Index 0
-caaataactgatcgggataataaatgagt  # Index 1
-aaacaaacagaaagggataataaatgagt  # Index 2
-...
-```
-
-### 3. Filtered FASTQ Files
-- Output from QUIK barcode calling
-- Must have barcode information in the read headers
-- Format: `@read_N_BARCODE` or similar
-
-## Usage
-
-### Basic Usage with Ground Truth
-
-Add the `ground_truth` parameter to your params file or command line:
+### 1M Scaling Benchmark (3 tools × 3 barcode counts = 9 runs)
 
 ```bash
-# Using params file
-nextflow run main.nf -profile conda -params-file test_params.json
+# 1. Generate jobs and params
+python3 bin/generate_jobs_and_params_1M_scaling.py \
+    --data-dir data/benchmark_85K_42K_21K \
+    --results-dir results/1million_reads
 
-# Command line
-nextflow run main.nf \\
-    -profile conda \\
-    --barcode_file /path/to/barcodes.txt \\
-    --r1_fastq /path/to/R1.fastq \\
-    --r2_fastq /path/to/R2.fastq \\
-    --ground_truth /path/to/ground_truth.txt \\
-    --sample_id my_sample \\
-    --outdir ./results
+# 2. Submit all jobs
+bash 1million_reads/submit_all_1M_benchmarks.sh
 ```
 
-### Parameters File Example
-
-```json
-{
-    "barcode_file": "/path/to/barcodes.txt",
-    "r1_fastq": "/path/to/R1.fastq",
-    "r2_fastq": "/path/to/R2.fastq",
-    "sample_id": "test_sample",
-    "ground_truth": "/path/to/ground_truth.txt",
-    "barcode_start": 0,
-    "barcode_length": 29,
-    "strategy": "7_mer_gpu_v1",
-    "distance_measure": "SEQUENCE_LEVENSHTEIN",
-    "rejection_threshold": 7,
-    "outdir": "./results"
-}
-```
-
-## Output Files
-
-The precision calculation produces two output files in the sample's output directory:
-
-### 1. Detailed Report (`{sample_id}_precision_report.txt`)
-
-Contains:
-- Overall metrics (total reads, assigned, unassigned)
-- Accuracy metrics (precision, recall, accuracy, assignment rate)
-- Top misassignments with barcode sequences
-
-Example:
-```
-================================================================================
-BARCODE CALLING PRECISION REPORT
-================================================================================
-
-=== OVERALL METRICS ===
-Total reads (ground truth): 1000000
-Reads processed: 1000000
-Reads assigned: 850000
-Reads unassigned/rejected: 150000
-
-=== ACCURACY METRICS ===
-Correct assignments: 840000
-Incorrect assignments: 10000
-Assignment rate: 85.00%
-Precision (correct/assigned): 98.82%
-Recall (correct/total): 84.00%
-Accuracy (correct/total): 84.00%
-
-=== TOP MISASSIGNMENTS ===
-Count | True Barcode (idx) | Assigned Barcode (idx)
---------------------------------------------------------------------------------
-  234 | ataataaatgagtggg... (   12) | caaataactgatcggg... (  145)
-  189 | attcgaacagagcggg... (  456) | aatcctactcacaggg... (  789)
-...
-```
-
-### 2. Summary CSV (`{sample_id}_precision_summary.csv`)
-
-Machine-readable summary for downstream analysis:
-
-```csv
-metric,value
-total_reads,1000000
-total_processed,1000000
-correct_assignments,840000
-incorrect_assignments,10000
-unassigned_reads,150000
-assignment_rate_percent,85.0000
-precision_percent,98.8235
-recall_percent,84.0000
-accuracy_percent,84.0000
-```
-
-## Metrics Explained
-
-- **Precision**: Percentage of assigned reads that were correctly assigned
-  - Formula: `(correct assignments / total assigned) × 100`
-  - Measures how accurate the assignments are when a barcode is assigned
-
-- **Recall**: Percentage of all reads that were correctly assigned
-  - Formula: `(correct assignments / total reads) × 100`
-  - Measures how many reads receive the correct barcode overall
-
-- **Accuracy**: Same as recall in this context
-  - Formula: `(correct assignments / total reads) × 100`
-
-- **Assignment Rate**: Percentage of reads that received any barcode assignment
-  - Formula: `(total assigned / total reads) × 100`
-  - Reads that don't meet quality thresholds are rejected (unassigned)
-
-## Running Without Ground Truth
-
-If you don't specify a ground truth file, the pipeline will run normally without precision calculation:
+### Runtime Benchmark (testing parallel scaling)
 
 ```bash
-nextflow run main.nf -profile conda -params-file params_no_truth.json
+# 1. Generate jobs and params
+python3 bin/generate_jobs_and_params_runtime.py \
+    --data-dir data/benchmark_85K_42K_21K_200K \
+    --results-dir results/runtime
+
+# 2. Submit all jobs
+bash runtime_benchmarks/SUBMIT_ALL_JOBS.sh
 ```
 
-The pipeline will log:
-```
-No ground truth file provided. Skipping precision calculation.
-To enable precision calculation, specify --ground_truth <file>
-```
-
-## Standalone Script Usage
-
-You can also run the precision calculation script independently:
+### Parameter Sweep (optimal threshold identification)
 
 ```bash
-calculate_precision.py \\
-    barcodes.txt \\
-    ground_truth.txt \\
-    filtered_R1.fastq \\
-    output_report.txt \\
-    output_summary.csv \\
-    --verbose
+# 1. Generate jobs and params for all barcode lengths
+python3 bin/generate_jobs_and_params_parameter_sweep.py \
+    --data-dir data/benchmark_85K_42K_21K_200K \
+    --results-dir results/parameter_sweeps \
+    --barcode-lengths 28 30 32 34 36
+
+# 2. Submit all jobs
+bash parameter_sweeps/submit_all_parameter_sweeps.sh
 ```
 
-## Notes
+### Real Data Benchmark (photolithographic arrays)
 
-- The ground truth file must have the same number of lines as there are reads in the input FASTQ files
-- Barcode indices in the ground truth file are 0-based (first barcode = index 0)
-- Reads that were rejected during barcode calling are counted as "unassigned"
-- The precision calculation only uses R1 FASTQ file (assumes barcode is in R1)
+```bash
+# 1. Generate jobs and params
+python3 bin/generate_jobs_and_params_real_data.py \
+    --data-dir data/ \
+    --barcode-dir /path/to/real_and_decoy_barcodes \
+    --results-dir results/real_data
 
-## Troubleshooting
+# 2. Submit all jobs
+bash barcode_seq/submit_all_tools.sh
+```
 
-### Issue: "Ground truth file not found"
-- Verify the file path is correct
-- Check file permissions
+## Configuration
 
-### Issue: "Mismatch between ground truth and FASTQ"
-- Ensure ground truth file has one line per read
-- Verify the ground truth corresponds to the input FASTQ files
+### Profiles
 
-### Issue: "No barcodes found in FASTQ headers"
-- Check that the filtered FASTQ files have barcode information in headers
-- Verify the header format matches expected pattern (e.g., `@read_N_BARCODE`)
+- **`-profile slurm`**: For HPC with SLURM scheduler
+- **`-profile local`**: For local execution
+- **`-profile conda`**: Use Conda for dependencies
+- **`-profile singularity`**: Use Singularity containers
+- **Combined**: `-profile slurm,conda` or `-profile local,singularity`
+
+See `conf/` for detailed configuration options.
+
+### Customizing parameters
+
+All benchmarks use generator scripts that accept:
+- `--data-dir`: where you extracted Zenodo datasets
+- `--results-dir`: where to write outputs
+- `--output-dir`: where to write job/params files (optional; has sensible defaults)
+
+Edit the generator scripts in `bin/` to change:
+- Tool-specific parameters (ntriage, rejection thresholds, etc.)
+- Resource allocations (CPUs, GPUs, memory, time limits)
+- SLURM partitions/clusters
+
+## Analysis
+
+Jupyter notebooks for analyzing benchmark results are provided in `notebooks/`:
+- `error_rate_benchmark_200K.ipynb`: Error-rate analysis
+- `Fullset_benchmark_1M.ipynb`: 1M scaling analysis
+- `barcode_count_sweep_analysis.ipynb`: Barcode library size effects
+- `parameter_sweep_analysis_*.ipynb`: Parameter calibration
+- `real_data_comparison.ipynb`: Real data results and overlap analysis
+- `runtime_analysis.ipynb`: Runtime/scaling analysis
+
+Tables and figures from the manuscript are exported to `notebooks/tables/` and `notebooks/figures/`.
+
+## Citation
+
+If you use this pipeline or benchmark data, please cite:
+
+```
+Poma-Soto et al. (2026). Benchmarking DNA Barcode Decoding Strategies Under High Error Rates.
+DOI: 10.5281/zenodo.18387161
+```
+
+Original tool papers:
+- **RandomBarcodes**: Press WH. (2022). PNAS Nexus, 1(5):pgac252
+- **QUIK**: Uphoff RC et al. (2026). [publication details]
+- **Columba**: Renders L et al. (2024). Bioinformatics
+
+## Project Structure
+
+```
+BarCall_benchmark/
+├── bin/                               # Generator scripts and helper utilities
+│   ├── generate_jobs_and_params_*.py  # Benchmark generators
+│   ├── calculate_precision*.py         # Metric calculation scripts
+│   └── quik/                          # QUIK source code
+├── envs/                              # Conda environment YML files
+├── modules/                           # Nextflow process modules
+├── conf/                              # Nextflow configuration
+├── docs/                              # Extended documentation
+├── main.nf                            # Main Nextflow workflow
+├── error_rate_benchmark/              # Error-rate jobs/params (generated)
+├── 1million_reads/                    # 1M scaling jobs/params (generated)
+├── runtime_benchmarks/                # Runtime jobs/params (generated)
+├── parameter_sweeps/                  # Parameter sweep jobs/params (generated)
+├── barcode_seq/                       # Real-data jobs/params (generated)
+└── notebooks/                         # Jupyter analysis notebooks
+```
+
+## License
+
+This benchmarking pipeline is released under [license TBD].  
+Individual tools retain their original licenses.
+
+## Contact
+
+For questions or issues: [franco.pomasoto@ugent.be](mailto:franco.pomasoto@ugent.be)

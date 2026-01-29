@@ -1,0 +1,4 @@
+Dataset,Reference_Barcodes,RB_Detected,RB_Coverage_%,QUIK_Detected,QUIK_Coverage_%,Columba_Detected,Columba_Coverage_%,Union_Detected,Union_Coverage_%
+21k,21476,20294,94.5%,20649,96.1%,20362,94.8%,20659,96.2%
+42k,42653,35077,82.2%,36304,85.1%,35821,84.0%,36514,85.6%
+85k,85305,18303,21.5%,39073,45.8%,43738,51.3%,46826,54.9%

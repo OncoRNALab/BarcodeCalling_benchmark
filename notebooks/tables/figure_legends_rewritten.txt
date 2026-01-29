@@ -1,0 +1,30 @@
+Figure legends (rewritten)
+=========================
+
+Figure 1. Parameter calibration (28-nt and 36-nt barcodes).
+Precision–recall curves obtained by sweeping the primary accept/reject parameter of each caller: rejection threshold r for QUIK, distance threshold Nthresh for RandomBarcodes (with multiple Ntriage settings), and identity threshold I for Columba. For QUIK, three decoding strategies were evaluated; for RandomBarcodes, multiple triage sizes were tested. Across tools, the swept threshold governs the precision–recall trade-off. RandomBarcodes showed little sensitivity to Ntriage in this regime, whereas QUIK’s 4-mer and 4+7-mer strategies outperformed the 7-mer strategy. Columba exhibited a sharp loss of precision when thresholds were relaxed to increase recall beyond ~60%.
+
+Figure 2. Parameter calibration at intermediate barcode lengths (30, 32, and 34 nt).
+Precision–recall curves from threshold sweeps at intermediate barcode lengths. For comparability, QUIK was run using the 4-mer strategy and RandomBarcodes with Ntriage=100. Increasing barcode length improves discriminability, enabling higher recall at consistently high precision across tools.
+
+Figure 3. Runtime comparison.
+Throughput (reads processed per second) for each caller under (A) single-device and (B) multi-device configurations. QUIK (single GPU, 4-mer strategy) achieved substantially higher throughput than RandomBarcodes even when RandomBarcodes was run with 4 GPUs, and higher than Columba run with 8 CPU threads.
+
+Figure 4. Scaling efficiency.
+Parallel speedup of RandomBarcodes and Columba as computational resources increase from single-device to multi-device runs. RandomBarcodes was evaluated with 1, 2, and 4 GPUs (for Ntriage=100 and 5,000). Columba was evaluated at fixed identity threshold (I=77) using 1, 2, 4, 8, and 16 CPU threads. Both methods exhibited near-linear strong scaling up to the tested limits, with Columba saturating beyond 8 threads under these workloads.
+
+Figure 5. Effect of barcode library size.
+(A) Precision and (B) recall as a function of barcode set size (21k, 42k, 85k) for 28-nt and 36-nt barcodes. Precision remained close to 100% for all callers except Columba on 28-nt barcodes, where precision decreased with increasing library size. The highest recall was achieved by QUIK on 36-nt barcodes.
+
+Figure 6. Scaling from 200k to 1 million reads.
+Changes in (A) precision and (B) recall when increasing read depth from 200,000 to 1,000,000 reads. All three callers showed minimal metric drift, indicating stable accuracy at higher depth.
+
+Figure 7. Effect of error rate.
+Precision–recall performance for each caller across barcode set sizes under three error regimes (low, medium, high; total error ≈18%, 21%, and 32%). RandomBarcodes and Columba maintained high precision across error regimes, whereas QUIK showed the largest precision decrease for the most challenging condition (85k barcodes, high error). Despite this, QUIK retained the highest recall across conditions, indicating that stricter thresholds could be used to trade recall for higher precision when required.
+
+Figure 8. Real experimental data.
+Assignment results on real sequencing data from photolithographically synthesized arrays of increasing spot density. Bars indicate the number of reads assigned by each tool, and annotated values report decoy-estimated precision. QUIK achieved the highest assignment rates while maintaining near-perfect precision across array densities.
+
+Figure 9. Barcode overlap on real data.
+Pairwise overlap of barcode sets called by each method on the three real datasets, quantified using Jaccard similarity. Overlap was high for lower-density arrays but decreased substantially for the full-density 85k array, where Columba recovered a large set of additional barcodes (~7,000) not detected by the k-mer–based methods.
+

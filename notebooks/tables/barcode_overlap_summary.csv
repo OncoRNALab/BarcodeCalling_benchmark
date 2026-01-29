@@ -1,0 +1,4 @@
+Dataset,Total_Unique_Barcodes,All_3_Tools,All_3_Tools_%,RB_&_QUIK_only,RB_&_Columba_only,QUIK_&_Columba_only,RB_only,QUIK_only,Columba_only,RB_unique,QUIK_unique,Columba_unique
+21k,20659,20259,98.1%,33,1,94,1,263,8,20294,20649,20362
+42k,36514,35009,95.9%,58,3,609,7,628,200,35077,36304,35821
+85k,46826,17929,38.3%,155,97,18178,122,2811,7534,18303,39073,43738

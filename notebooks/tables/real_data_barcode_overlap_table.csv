@@ -1,0 +1,4 @@
+array,reference_barcodes,randombarcodes_called,randombarcodes_called_percent,quik_called,quik_called_percent,columba_called,columba_called_percent,all_three_called,all_three_called_percent,rb_only,quik_only,columba_only
+21k,21476,20294,94.50,20649,96.16,20357,94.78,20258,94.33,1,263,4
+42k,42653,35077,82.23,36304,85.11,35792,83.91,35008,82.08,7,632,176
+85k,85305,18303,21.46,39073,45.80,43048,50.46,17906,20.99,130,2989,7053

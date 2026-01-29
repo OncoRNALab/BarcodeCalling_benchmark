@@ -1,0 +1,55 @@
+================================================================================
+PARAMETER SWEEP ANALYSIS SUMMARY - 28nt Barcodes
+================================================================================
+
+Dataset: 21,000 barcodes (28nt), 200,000 simulated reads
+Total configurations tested: 47
+
+--------------------------------------------------------------------------------
+OVERALL PERFORMANCE BY TOOL
+--------------------------------------------------------------------------------
+
+RandomBarcodes:
+  Configurations: 24
+  Avg Precision:  93.68% (±6.98)
+  Avg Recall:     65.99% (±17.42)
+  Avg F1-Score:   75.38 (±11.57)
+  Avg Assign Rate: 71.97%
+
+QUIK:
+  Configurations: 18
+  Avg Precision:  93.08% (±8.67)
+  Avg Recall:     64.57% (±12.41)
+  Avg F1-Score:   74.99 (±8.02)
+  Avg Assign Rate: 70.81%
+
+Columba:
+  Configurations: 5
+  Avg Precision:  91.82% (±9.61)
+  Avg Recall:     52.19% (±17.29)
+  Avg F1-Score:   64.23 (±13.13)
+  Avg Assign Rate: 58.78%
+
+--------------------------------------------------------------------------------
+BEST CONFIGURATION PER TOOL (by F1-score)
+--------------------------------------------------------------------------------
+
+RandomBarcodes: RB_t100_n8
+  Precision:  95.13%
+  Recall:     76.83%
+  F1-Score:   85.00
+  Assign Rate: 80.76%
+
+QUIK: QUIK_4mer_r8
+  Precision:  95.75%
+  Recall:     74.33%
+  F1-Score:   83.69
+  Assign Rate: 77.63%
+
+Columba: Columba_I72
+  Precision:  81.39%
+  Recall:     67.45%
+  F1-Score:   73.77
+  Assign Rate: 82.87%
+
+================================================================================

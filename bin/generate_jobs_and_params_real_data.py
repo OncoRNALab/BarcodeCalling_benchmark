@@ -146,11 +146,10 @@ def generate_real_data_benchmark(
                 job_name = f"{tool.upper()[:4]}_{run_type}_{array_label}"
                 job_file = tool_dir / 'jobs' / f"job_{array_label}{'_decoy' if run_type == 'decoy' else ''}.sh"
                 
-                # Get absolute paths
-                project_dir = output_dir.parent.resolve()
-                params_file_abs = params_file.resolve()
-                work_dir_abs = project_dir / "work_real_data" / tool / f"{array_label}_{run_type}"
-                logs_dir_abs = (tool_dir / "logs").resolve()
+                # Relative paths from project root
+                params_rel = f"barcode_seq/{tool}/params/params_{array_label}{'_decoy' if run_type == 'decoy' else ''}.json"
+                work_rel = f"work_real_data/{tool}/{array_label}_{run_type}"
+                logs_rel = f"barcode_seq/{tool}/logs"
                 
                 # Determine resource requirements
                 if tool == 'columba':
@@ -165,29 +164,17 @@ def generate_real_data_benchmark(
 #SBATCH --ntasks=1
 {resources}
 #SBATCH --time={time_limit}
-#SBATCH --output={logs_dir_abs}/{job_name}.out
-#SBATCH --error={logs_dir_abs}/{job_name}.err
+#SBATCH --output={logs_rel}/{job_name}.out
+#SBATCH --error={logs_rel}/{job_name}.err
 
 # Load Nextflow module
 ml Nextflow/25.04.8
 
-# Define directories
-PROJECT_DIR="{project_dir}"
-WORK_DIR="{work_dir_abs}"
-
-# Create and move to unique work directory for this job to avoid lock conflicts
-mkdir -p "$WORK_DIR"
-cd "$WORK_DIR"
-
-# Run pipeline
-nextflow run "$PROJECT_DIR/main.nf" \\
-    -c "$PROJECT_DIR/nextflow.config" \\
-    -profile slurm \\
-    -params-file {params_file_abs} \\
-    -work-dir "$WORK_DIR" \\
-    -resume
-
-echo "Job completed for {tool.upper()} - {array_name} {run_type}"
+# Run pipeline from project root directory
+nextflow run main.nf \\
+    -params-file {params_rel} \\
+    -work-dir {work_rel} \\
+    -profile slurm
 """
                 
                 with open(job_file, 'w') as f:

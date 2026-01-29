@@ -113,11 +113,10 @@ def generate_1M_scaling_benchmark(
             job_name = f"{tool.upper()[:2]}_{bc_label}_1M"
             job_file = jobs_dir / f"{tool}_{bc_label}.sh"
             
-            # Get absolute paths
-            project_dir = output_dir.parent.resolve()
-            params_file_abs = params_file.resolve()
-            work_dir_abs = project_dir / "work_1million_reads" / tool / bc_label
-            log_dir_abs = (output_dir / "logs").resolve()
+            # Relative paths from project root
+            params_rel = f"1million_reads/params/{tool}_{bc_label}.json"
+            work_rel = f"work_1million_reads/{tool}/{bc_label}"
+            logs_rel = "1million_reads/logs"
             
             # Determine resource requirements
             if tool == 'columba':
@@ -132,29 +131,17 @@ def generate_1M_scaling_benchmark(
 #SBATCH --ntasks=1
 {resources}
 #SBATCH --time={time_limit}
-#SBATCH --output={log_dir_abs}/{job_name}.out
-#SBATCH --error={log_dir_abs}/{job_name}.err
+#SBATCH --output={logs_rel}/{job_name}.out
+#SBATCH --error={logs_rel}/{job_name}.err
 
 # Load Nextflow module
 ml Nextflow/25.04.8
 
-# Define directories
-PROJECT_DIR="{project_dir}"
-WORK_DIR="{work_dir_abs}"
-
-# Create and move to unique work directory for this job to avoid lock conflicts
-mkdir -p "$WORK_DIR"
-cd "$WORK_DIR"
-
-# Run pipeline
-nextflow run "$PROJECT_DIR/main.nf" \\
-    -c "$PROJECT_DIR/nextflow.config" \\
-    -profile slurm \\
-    -params-file {params_file_abs} \\
-    -work-dir "$WORK_DIR" \\
-    -resume
-
-echo "Job completed for {tool.upper()} - {bc_label} 1M reads"
+# Run pipeline from project root directory
+nextflow run main.nf \\
+    -params-file {params_rel} \\
+    -work-dir {work_rel} \\
+    -profile slurm
 """
             
             with open(job_file, 'w') as f:

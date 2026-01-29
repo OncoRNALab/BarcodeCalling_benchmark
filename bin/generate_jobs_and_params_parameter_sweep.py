@@ -93,11 +93,10 @@ def generate_parameter_sweep(
             job_name = f"RB{barcode_length}_t{ntriage}_n{nthresh}"
             job_file = rb_jobs_dir / f"job_t{ntriage}_n{nthresh}.sh"
             
-            # Get absolute paths
-            project_dir = output_dir.parent.parent.resolve()
-            params_file_abs = params_file.resolve()
-            work_dir_abs = project_dir / f"work_sweep_rb_{barcode_length}nt" / f"t{ntriage}_n{nthresh}"
-            logs_dir_abs = (rb_dir / "logs").resolve()
+            # Relative paths from project root
+            params_rel = f"parameter_sweeps/{barcode_length}nt/randombarcodes/params/params_t{ntriage}_n{nthresh}.json"
+            work_rel = f"work_sweep_rb_{barcode_length}nt/t{ntriage}_n{nthresh}"
+            logs_rel = f"parameter_sweeps/{barcode_length}nt/randombarcodes/logs"
             
             job_content = f"""#!/bin/bash
 #SBATCH -J {job_name}
@@ -107,29 +106,17 @@ def generate_parameter_sweep(
 #SBATCH --mem=16G
 #SBATCH --time=08:00:00
 #SBATCH --clusters=joltik,accelgor
-#SBATCH --output={logs_dir_abs}/{job_name}.out
-#SBATCH --error={logs_dir_abs}/{job_name}.err
+#SBATCH --output={logs_rel}/{job_name}.out
+#SBATCH --error={logs_rel}/{job_name}.err
 
 # Load Nextflow module
 ml Nextflow/25.04.8
 
-# Define directories
-PROJECT_DIR="{project_dir}"
-WORK_DIR="{work_dir_abs}"
-
-# Create and move to unique work directory for this job to avoid lock conflicts
-mkdir -p "$WORK_DIR"
-cd "$WORK_DIR"
-
-# Run pipeline
-nextflow run "$PROJECT_DIR/main.nf" \\
-    -c "$PROJECT_DIR/nextflow.config" \\
-    -profile slurm \\
-    -params-file {params_file_abs} \\
-    -work-dir "$WORK_DIR" \\
-    -resume
-
-echo "Job completed for RandomBarcodes - {barcode_length}nt ntriage={ntriage} nthresh={nthresh}"
+# Run pipeline from project root directory
+nextflow run main.nf \\
+    -params-file {params_rel} \\
+    -work-dir {work_rel} \\
+    -profile slurm
 """
             
             with open(job_file, 'w') as f:
@@ -173,11 +160,10 @@ echo "Job completed for RandomBarcodes - {barcode_length}nt ntriage={ntriage} nt
             job_name = f"QK{barcode_length}_{strat_short}mer_r{r}"
             job_file = quik_jobs_dir / f"job_{strat_short}mer_r{r}.sh"
             
-            # Get absolute paths
-            project_dir = output_dir.parent.parent.resolve()
-            params_file_abs = params_file.resolve()
-            work_dir_abs = project_dir / f"work_sweep_quik_{barcode_length}nt" / f"{strat_short}mer_r{r}"
-            logs_dir_abs = (quik_dir / "logs").resolve()
+            # Relative paths from project root
+            params_rel = f"parameter_sweeps/{barcode_length}nt/quik/params/params_{strat_short}mer_r{r}.json"
+            work_rel = f"work_sweep_quik_{barcode_length}nt/{strat_short}mer_r{r}"
+            logs_rel = f"parameter_sweeps/{barcode_length}nt/quik/logs"
             
             job_content = f"""#!/bin/bash
 #SBATCH -J {job_name}
@@ -187,29 +173,17 @@ echo "Job completed for RandomBarcodes - {barcode_length}nt ntriage={ntriage} nt
 #SBATCH --mem=16G
 #SBATCH --time=08:00:00
 #SBATCH --clusters=joltik,accelgor
-#SBATCH --output={logs_dir_abs}/{job_name}.out
-#SBATCH --error={logs_dir_abs}/{job_name}.err
+#SBATCH --output={logs_rel}/{job_name}.out
+#SBATCH --error={logs_rel}/{job_name}.err
 
 # Load Nextflow module
 ml Nextflow/25.04.8
 
-# Define directories
-PROJECT_DIR="{project_dir}"
-WORK_DIR="{work_dir_abs}"
-
-# Create and move to unique work directory for this job to avoid lock conflicts
-mkdir -p "$WORK_DIR"
-cd "$WORK_DIR"
-
-# Run pipeline
-nextflow run "$PROJECT_DIR/main.nf" \\
-    -c "$PROJECT_DIR/nextflow.config" \\
-    -profile slurm \\
-    -params-file {params_file_abs} \\
-    -work-dir "$WORK_DIR" \\
-    -resume
-
-echo "Job completed for QUIK - {barcode_length}nt {strategy} rejection={r}"
+# Run pipeline from project root directory
+nextflow run main.nf \\
+    -params-file {params_rel} \\
+    -work-dir {work_rel} \\
+    -profile slurm
 """
             
             with open(job_file, 'w') as f:
@@ -250,11 +224,10 @@ echo "Job completed for QUIK - {barcode_length}nt {strategy} rejection={r}"
         job_name = f"CB{barcode_length}_I{identity_thresh}"
         job_file = col_jobs_dir / f"job_I{identity_thresh}.sh"
         
-        # Get absolute paths
-        project_dir = output_dir.parent.parent.resolve()
-        params_file_abs = params_file.resolve()
-        work_dir_abs = project_dir / f"work_sweep_columba_{barcode_length}nt" / f"I{identity_thresh}"
-        logs_dir_abs = (col_dir / "logs").resolve()
+        # Relative paths from project root
+        params_rel = f"parameter_sweeps/{barcode_length}nt/columba/params/params_I{identity_thresh}.json"
+        work_rel = f"work_sweep_columba_{barcode_length}nt/I{identity_thresh}"
+        logs_rel = f"parameter_sweeps/{barcode_length}nt/columba/logs"
         
         job_content = f"""#!/bin/bash
 #SBATCH -J {job_name}
@@ -262,29 +235,17 @@ echo "Job completed for QUIK - {barcode_length}nt {strategy} rejection={r}"
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=08:00:00
-#SBATCH --output={logs_dir_abs}/{job_name}.out
-#SBATCH --error={logs_dir_abs}/{job_name}.err
+#SBATCH --output={logs_rel}/{job_name}.out
+#SBATCH --error={logs_rel}/{job_name}.err
 
 # Load Nextflow module
 ml Nextflow/25.04.8
 
-# Define directories
-PROJECT_DIR="{project_dir}"
-WORK_DIR="{work_dir_abs}"
-
-# Create and move to unique work directory for this job to avoid lock conflicts
-mkdir -p "$WORK_DIR"
-cd "$WORK_DIR"
-
-# Run pipeline
-nextflow run "$PROJECT_DIR/main.nf" \\
-    -c "$PROJECT_DIR/nextflow.config" \\
-    -profile slurm \\
-    -params-file {params_file_abs} \\
-    -work-dir "$WORK_DIR" \\
-    -resume
-
-echo "Job completed for Columba - {barcode_length}nt identity={identity_thresh}"
+# Run pipeline from project root directory
+nextflow run main.nf \\
+    -params-file {params_rel} \\
+    -work-dir {work_rel} \\
+    -profile slurm
 """
         
         with open(job_file, 'w') as f:

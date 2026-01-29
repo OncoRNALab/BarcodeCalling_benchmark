@@ -114,11 +114,10 @@ def generate_error_rate_benchmark(
                 job_name = f"{tool.upper()[:2]}_{bc_label}_{BARCODE_LENGTH}nt_{error_rate}"
                 job_file = jobs_dir / f"{tool}_{bc_label}_{error_rate}.sh"
                 
-                # Get absolute paths
-                project_dir = output_dir.parent.resolve()
-                params_file_abs = params_file.resolve()
-                work_dir_abs = project_dir / f"work_error_rate" / tool / f"{bc_label}_{error_rate}"
-                log_dir_abs = (output_dir / "logs").resolve()
+                # Relative paths from project root
+                params_rel = f"error_rate_benchmark/params/{tool}_{bc_label}_{error_rate}.json"
+                work_rel = f"work_error_rate/{tool}/{bc_label}_{error_rate}"
+                logs_rel = f"error_rate_benchmark/logs"
                 
                 # Determine resource requirements
                 if tool == 'columba':
@@ -131,29 +130,17 @@ def generate_error_rate_benchmark(
 #SBATCH --ntasks=1
 {resources}
 #SBATCH --time=08:00:00
-#SBATCH --output={log_dir_abs}/{job_name}.out
-#SBATCH --error={log_dir_abs}/{job_name}.err
+#SBATCH --output={logs_rel}/{job_name}.out
+#SBATCH --error={logs_rel}/{job_name}.err
 
 # Load Nextflow module
 ml Nextflow/25.04.8
 
-# Define directories
-PROJECT_DIR="{project_dir}"
-WORK_DIR="{work_dir_abs}"
-
-# Create and move to unique work directory for this job to avoid lock conflicts
-mkdir -p "$WORK_DIR"
-cd "$WORK_DIR"
-
-# Run pipeline
-nextflow run "$PROJECT_DIR/main.nf" \\
-    -c "$PROJECT_DIR/nextflow.config" \\
-    -profile slurm \\
-    -params-file {params_file_abs} \\
-    -work-dir "$WORK_DIR" \\
-    -resume
-
-echo "Job completed for {tool.upper()} - {bc_label} {BARCODE_LENGTH}nt {error_rate} error"
+# Run pipeline from project root directory
+nextflow run main.nf \\
+    -params-file {params_rel} \\
+    -work-dir {work_rel} \\
+    -profile slurm
 """
                 
                 with open(job_file, 'w') as f:

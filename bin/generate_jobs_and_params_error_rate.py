@@ -114,26 +114,46 @@ def generate_error_rate_benchmark(
                 job_name = f"{tool.upper()[:2]}_{bc_label}_{BARCODE_LENGTH}nt_{error_rate}"
                 job_file = jobs_dir / f"{tool}_{bc_label}_{error_rate}.sh"
                 
+                # Get absolute paths
+                project_dir = output_dir.parent.resolve()
+                params_file_abs = params_file.resolve()
+                work_dir_abs = project_dir / f"work_error_rate" / tool / f"{bc_label}_{error_rate}"
+                log_dir_abs = (output_dir / "logs").resolve()
+                
                 # Determine resource requirements
                 if tool == 'columba':
-                    resources = f"#SBATCH --cpus-per-task={TOOLS[tool]['cpus']} --mem=8G"
+                    resources = f"#SBATCH --cpus-per-task={TOOLS[tool]['cpus']}\n#SBATCH --mem=16G"
                 else:  # GPU tools
-                    resources = f"#SBATCH --gres=gpu:1 --cpus-per-task=1 --mem=4G --clusters=joltik,accelgor"
+                    resources = f"#SBATCH --gres=gpu:1\n#SBATCH --cpus-per-task=1\n#SBATCH --mem=16G\n#SBATCH --clusters=joltik,accelgor"
                 
                 job_content = f"""#!/bin/bash
 #SBATCH -J {job_name}
-#SBATCH -o {output_dir}/logs/{job_name}.out
-#SBATCH -e {output_dir}/logs/{job_name}.err
-#SBATCH -t 08:00:00
+#SBATCH --ntasks=1
 {resources}
+#SBATCH --time=08:00:00
+#SBATCH --output={log_dir_abs}/{job_name}.out
+#SBATCH --error={log_dir_abs}/{job_name}.err
 
-cd {output_dir.parent}
+# Load Nextflow module
+ml Nextflow/25.04.8
 
-nextflow run main.nf \\
-    -params-file {params_file} \\
-    -work-dir work_{sample_id} \\
+# Define directories
+PROJECT_DIR="{project_dir}"
+WORK_DIR="{work_dir_abs}"
+
+# Create and move to unique work directory for this job to avoid lock conflicts
+mkdir -p "$WORK_DIR"
+cd "$WORK_DIR"
+
+# Run pipeline
+nextflow run "$PROJECT_DIR/main.nf" \\
+    -c "$PROJECT_DIR/nextflow.config" \\
     -profile slurm \\
+    -params-file {params_file_abs} \\
+    -work-dir "$WORK_DIR" \\
     -resume
+
+echo "Job completed for {tool.upper()} - {bc_label} {BARCODE_LENGTH}nt {error_rate} error"
 """
                 
                 with open(job_file, 'w') as f:

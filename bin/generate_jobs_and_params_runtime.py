@@ -91,7 +91,7 @@ def generate_runtime_benchmark(
                     "gpus": config['gpus'],
                     "barcode_start": 0
                 })
-                resources = f"#SBATCH --gres=gpu:{config['gpus']} --cpus-per-task={config['gpus']} --mem=8G --time=08:00:00 --clusters=joltik,accelgor"
+                resources = f"#SBATCH --gres=gpu:{config['gpus']}\n#SBATCH --cpus-per-task={config['gpus']}\n#SBATCH --mem=16G\n#SBATCH --clusters=joltik,accelgor"
             elif tool == 'quik':
                 params.update({
                     "strategy": config['strategy'],
@@ -101,7 +101,7 @@ def generate_runtime_benchmark(
                     "barcode_start": 0,
                     "barcode_window": f"0-{BARCODE_LENGTH}"
                 })
-                resources = f"#SBATCH --gres=gpu:{config['gpus']} --cpus-per-task={config['gpus']} --mem=8G --time=08:00:00 --clusters=joltik,accelgor"
+                resources = f"#SBATCH --gres=gpu:{config['gpus']}\n#SBATCH --cpus-per-task={config['gpus']}\n#SBATCH --mem=16G\n#SBATCH --clusters=joltik,accelgor"
             elif tool == 'columba':
                 params.update({
                     "identity_threshold": config['identity_threshold'],
@@ -109,7 +109,7 @@ def generate_runtime_benchmark(
                     "columba_repo": "/user/gent/446/vsc44685/ScratchVO_dir/columba",
                     "barcode_window": f"0-{BARCODE_LENGTH}"
                 })
-                resources = f"#SBATCH --cpus-per-task={config['cpus']} --mem=8G --time=08:00:00"
+                resources = f"#SBATCH --cpus-per-task={config['cpus']}\n#SBATCH --mem=16G"
             
             # Write parameter JSON
             params_file = params_dir / f"params_{config_name}.json"
@@ -120,19 +120,40 @@ def generate_runtime_benchmark(
             job_name = f"{tool.upper()[:2]}_runtime_{config_name}"
             job_file = jobs_dir / f"job_{config_name}.sh"
             
+            # Get absolute paths
+            project_dir = output_dir.parent.resolve()
+            params_file_abs = params_file.resolve()
+            work_dir_abs = project_dir / "work_runtime" / tool / config_name
+            logs_dir_abs = logs_dir.resolve()
+            
             job_content = f"""#!/bin/bash
 #SBATCH -J {job_name}
-#SBATCH -o {logs_dir}/{job_name}.out
-#SBATCH -e {logs_dir}/{job_name}.err
+#SBATCH --ntasks=1
 {resources}
+#SBATCH --time=08:00:00
+#SBATCH --output={logs_dir_abs}/{job_name}.out
+#SBATCH --error={logs_dir_abs}/{job_name}.err
 
-cd {output_dir.parent}
+# Load Nextflow module
+ml Nextflow/25.04.8
 
-nextflow run main.nf \\
-    -params-file {params_file} \\
-    -work-dir work_runtime/{tool}/{config_name} \\
+# Define directories
+PROJECT_DIR="{project_dir}"
+WORK_DIR="{work_dir_abs}"
+
+# Create and move to unique work directory for this job to avoid lock conflicts
+mkdir -p "$WORK_DIR"
+cd "$WORK_DIR"
+
+# Run pipeline
+nextflow run "$PROJECT_DIR/main.nf" \\
+    -c "$PROJECT_DIR/nextflow.config" \\
     -profile slurm \\
+    -params-file {params_file_abs} \\
+    -work-dir "$WORK_DIR" \\
     -resume
+
+echo "Job completed for {tool.upper()} - runtime {config_name}"
 """
             
             with open(job_file, 'w') as f:

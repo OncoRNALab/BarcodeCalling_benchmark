@@ -7,6 +7,7 @@ process COLUMBA_BUILD {
     // Conda environment for LOCAL execution
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
     conda "${moduleDir}/../envs/columba.yml"
+    container "${moduleDir}/../containers_backup/columba_build.sif"
     
     publishDir "${params.outdir}/columba_build", mode: 'copy'
     
@@ -80,6 +81,7 @@ process COLUMBA_INDEX {
     // Conda environment for LOCAL execution
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
     conda "${moduleDir}/../envs/columba.yml"
+    container "${moduleDir}/../containers_backup/columba_build.sif"
     
     publishDir "${params.outdir}/${meta.id}/columba_index", mode: 'copy'
     
@@ -128,6 +130,7 @@ process COLUMBA_ALIGN {
     // Conda environment for LOCAL execution
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
     conda "${moduleDir}/../envs/columba.yml"
+    container "${moduleDir}/../containers_backup/columba_build.sif"
     
     publishDir "${params.outdir}/${meta.id}", mode: 'copy'
     

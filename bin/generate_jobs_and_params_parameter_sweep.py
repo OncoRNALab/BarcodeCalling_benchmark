@@ -116,7 +116,10 @@ ml Nextflow/25.04.8
 nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
-    -profile slurm
+    -profile slurm \\
+    -with-report parameter_sweeps/{barcode_length}nt/reports/{job_name}_report.html \\
+    -with-timeline parameter_sweeps/{barcode_length}nt/reports/{job_name}_timeline.html \\
+    -with-dag parameter_sweeps/{barcode_length}nt/reports/{job_name}_dag.html
 """
             
             with open(job_file, 'w') as f:
@@ -183,7 +186,10 @@ ml Nextflow/25.04.8
 nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
-    -profile slurm
+    -profile slurm \\
+    -with-report parameter_sweeps/{barcode_length}nt/reports/{job_name}_report.html \\
+    -with-timeline parameter_sweeps/{barcode_length}nt/reports/{job_name}_timeline.html \\
+    -with-dag parameter_sweeps/{barcode_length}nt/reports/{job_name}_dag.html
 """
             
             with open(job_file, 'w') as f:
@@ -245,7 +251,10 @@ ml Nextflow/25.04.8
 nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
-    -profile slurm
+    -profile slurm \\
+    -with-report parameter_sweeps/{barcode_length}nt/reports/{job_name}_report.html \\
+    -with-timeline parameter_sweeps/{barcode_length}nt/reports/{job_name}_timeline.html \\
+    -with-dag parameter_sweeps/{barcode_length}nt/reports/{job_name}_dag.html
 """
         
         with open(job_file, 'w') as f:

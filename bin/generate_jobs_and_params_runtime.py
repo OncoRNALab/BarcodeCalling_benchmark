@@ -140,7 +140,10 @@ ml Nextflow/25.04.8
 nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
-    -profile slurm
+    -profile slurm \\
+    -with-report runtime_benchmarks/reports/{job_name}_report.html \\
+    -with-timeline runtime_benchmarks/reports/{job_name}_timeline.html \\
+    -with-dag runtime_benchmarks/reports/{job_name}_dag.html
 """
             
             with open(job_file, 'w') as f:

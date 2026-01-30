@@ -115,6 +115,7 @@ def generate_real_data_benchmark(
                 # Add tool-specific parameters
                 if tool == 'randombarcodes':
                     params.update({
+                        "n_barcodes": array_info['count'],
                         "ntriage": TOOLS[tool]['ntriage'],
                         "nthresh": TOOLS[tool]['nthresh'],
                         "gpus": TOOLS[tool]['gpus'],

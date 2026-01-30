@@ -82,6 +82,7 @@ def generate_error_rate_benchmark(
                 if tool == 'randombarcodes':
                     params.update({
                         "comment_randombarcodes": "RandomBarcodes-specific parameters",
+                        "n_barcodes": BARCODE_COUNTS[bc_label],
                         "ntriage": TOOLS[tool]['ntriage'],
                         "nthresh": TOOLS[tool]['nthresh'],
                         "gpus": TOOLS[tool]['gpus']

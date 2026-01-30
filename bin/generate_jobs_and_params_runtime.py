@@ -86,6 +86,7 @@ def generate_runtime_benchmark(
             # Add tool-specific runtime parameters
             if tool == 'randombarcodes':
                 params.update({
+                    "n_barcodes": 21000,  # Runtime benchmark uses 21K dataset
                     "ntriage": config['ntriage'],
                     "nthresh": config['nthresh'],
                     "gpus": config['gpus'],

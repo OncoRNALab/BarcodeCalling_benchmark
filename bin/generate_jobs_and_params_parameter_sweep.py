@@ -81,6 +81,7 @@ def generate_parameter_sweep(
                 "barcode_length": barcode_length,
                 "barcode_start": 0,
                 "outdir": str(results_dir / f"results_{barcode_length}nt" / "randombarcodes_sweep" / f"t{ntriage}_n{nthresh}"),
+                "n_barcodes": 21000,  # Parameter sweep uses 21K dataset
                 "ntriage": ntriage,
                 "nthresh": nthresh,
                 "gpus": 1

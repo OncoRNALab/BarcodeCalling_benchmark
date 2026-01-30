@@ -74,7 +74,7 @@ def generate_error_rate_benchmark(
                     "r2_fastq": str(bc_dir / f"reads_{bc_label}_{BARCODE_LENGTH}_{error_rate}_R2.fastq"),
                     "sample_id": sample_id,
                     "barcode_length": BARCODE_LENGTH,
-                    "outdir": str(results_dir / sample_id),
+                    "outdir": str(results_dir / tool / f"{bc_label}_{BARCODE_LENGTH}nt_{error_rate}"),
                     "ground_truth": str(bc_dir / f"answers_{bc_label}_{BARCODE_LENGTH}_{error_rate}"),
                 }
                 

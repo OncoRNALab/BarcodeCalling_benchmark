@@ -79,7 +79,7 @@ def generate_runtime_benchmark(
                 "r2_fastq": str(bc_dir / f"reads_{BARCODE_COUNT}_{BARCODE_LENGTH}_{ERROR_RATE}_R2.fastq"),
                 "sample_id": sample_id,
                 "barcode_length": BARCODE_LENGTH,
-                "outdir": str(results_dir / tool),
+                "outdir": str(results_dir / tool / f"{BARCODE_LENGTH}nt" / config_name),
                 "ground_truth": str(bc_dir / f"answers_{BARCODE_COUNT}_{BARCODE_LENGTH}_{ERROR_RATE}"),
             }
             

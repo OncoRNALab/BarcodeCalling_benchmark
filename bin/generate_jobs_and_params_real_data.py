@@ -109,7 +109,7 @@ def generate_real_data_benchmark(
                     "tool": tool,
                     "sample_id": sample_id,
                     "data_mode": "real",
-                    "outdir": str(results_dir / tool / f"{array_label}_{run_type}" if run_type == 'decoy' else results_dir / tool / array_label)
+                    "outdir": str(results_dir / tool / f"{array_label}_{run_type}") if run_type == 'decoy' else str(results_dir / tool / array_label)
                 }
                 
                 # Add tool-specific parameters

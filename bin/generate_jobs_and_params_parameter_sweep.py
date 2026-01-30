@@ -324,7 +324,7 @@ def main():
         return 1
     
     print(f"Generating parameter sweep benchmarks...")
-    print(f"  Data directory: {data_dir}")
+    print(f"  Data directory: {args.data_dir}")
     print(f"  Output directory: {args.output_dir}")
     print(f"  Results directory: {args.results_dir}")
     print(f"  Barcode lengths: {args.barcode_lengths}")

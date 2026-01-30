@@ -50,6 +50,95 @@ The benchmarks evaluate accuracy (precision/recall), runtime, and scalability ac
 - **Must provide `columba_repo` parameter** in JSON files pointing to the cloned directory
 - Pipeline uses HPC modules (CMake/GCCcore) for compilation
 
+---
+
+## HPC Module Configuration
+
+### Default Modules (UGent HPC - Joltik/Accelgor)
+
+When using `-profile slurm`, the pipeline automatically loads the following HPC modules:
+
+#### For QUIK & RandomBarcodes (GPU tools):
+```bash
+module load CMake/3.26.3-GCCcore-12.3.0
+module load PyTorch-bundle/2.1.2-foss-2023a-CUDA-12.1.1
+```
+- **CMake**: Required for compiling QUIK from source
+- **PyTorch-bundle**: Provides PyTorch, CUDA, and dependencies for GPU acceleration
+
+#### For Columba:
+```bash
+module load CMake/3.29.3-GCCcore-13.3.0  # For building
+module load GCCcore/13.3.0               # For indexing and alignment
+```
+- **CMake**: Required for compiling Columba
+- **GCCcore**: Provides g++ and build tools
+
+### Customizing for Your HPC System
+
+If you're using a different HPC system, you'll need to modify the module names to match your environment:
+
+#### Step 1: Check Available Modules
+
+```bash
+# List all available modules
+module avail
+
+# Search for specific packages
+module spider CMake
+module spider PyTorch
+module spider CUDA
+module spider GCC
+```
+
+#### Step 2: Modify Configuration File
+
+Edit `conf/executors/slurm.config` and update the module names:
+
+```groovy
+// For GPU processes (QUIK & RandomBarcodes)
+withLabel: use_gpu {
+    beforeScript = 'module load CMake/YOUR_VERSION && module load PyTorch-bundle/YOUR_VERSION'
+}
+
+// For Columba
+withName: 'COLUMBA_BUILD' {
+    beforeScript = 'module load CMake/YOUR_VERSION'
+}
+withName: 'COLUMBA_INDEX' {
+    beforeScript = 'module load GCCcore/YOUR_VERSION'
+}
+withName: 'COLUMBA_ALIGN' {
+    beforeScript = 'module load GCCcore/YOUR_VERSION'
+}
+```
+
+#### Step 3: Required Software Versions
+
+Make sure your modules provide:
+- **CMake**: ≥ 3.20
+- **CUDA**: ≥ 11.8 (for GPU tools)
+- **PyTorch**: ≥ 2.0 with CUDA support
+- **GCC/g++**: ≥ 11.0 (for Columba)
+
+#### Alternative: Skip Module Loading
+
+If your HPC doesn't use modules, or software is already in PATH, you can remove module loading:
+
+```groovy
+// For GPU processes
+withLabel: use_gpu {
+    beforeScript = ''  // Empty - assumes software is in PATH
+}
+
+// For Columba
+withName: 'COLUMBA_BUILD' {
+    beforeScript = ''
+}
+```
+
+**Note**: Job submission scripts also load `Nextflow/25.04.8` module. If your HPC uses a different module name or if Nextflow is already available, modify the generated job scripts accordingly.
+
 ## Data Download (Zenodo)
 
 All benchmark datasets are deposited at **Zenodo DOI: [10.5281/zenodo.18387161](https://doi.org/10.5281/zenodo.18387161)**

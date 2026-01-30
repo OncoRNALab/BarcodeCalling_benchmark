@@ -141,56 +141,52 @@ withName: 'COLUMBA_BUILD' {
 
 ---
 
-## Singularity/Apptainer Cache Configuration
+## Profile-Specific Configuration
 
-### Avoiding Home Directory Disk Quota Issues
+### Using `local,singularity` Profile
 
-By default, Singularity/Apptainer stores container images and temporary files in your home directory (`~/.apptainer/cache`), which can quickly exceed disk quotas when pulling large container images.
+When using the `local,singularity` profile, you **must export Apptainer/Singularity cache environment variables** to avoid home directory disk quota issues.
 
-**All generated job scripts automatically configure cache directories to use scratch space** by exporting these environment variables before running Nextflow:
-
-```bash
-SCRATCH_DIR="${VSC_SCRATCH_VO_USER:-${VSC_SCRATCH:-$HOME/scratch}}"
-export APPTAINER_TMPDIR="$SCRATCH_DIR/.apptainer/tmp"
-export APPTAINER_CACHEDIR="$SCRATCH_DIR/.apptainer/cache"
-export SINGULARITY_CACHEDIR="$SCRATCH_DIR/singularity"
-export NXF_SINGULARITY_CACHEDIR="$SCRATCH_DIR/.apptainer/cache"
-```
-
-### Manual Execution
-
-If you're running Nextflow commands manually (not using generated job scripts), **export these variables before running Nextflow**:
+**Before submitting jobs or running Nextflow, export these variables** (adjust paths to directories with sufficient disk space):
 
 ```bash
-# Set cache directories to scratch
-SCRATCH_DIR="${VSC_SCRATCH_VO_USER:-${VSC_SCRATCH:-$HOME/scratch}}"
-export APPTAINER_TMPDIR="$SCRATCH_DIR/.apptainer/tmp"
-export APPTAINER_CACHEDIR="$SCRATCH_DIR/.apptainer/cache"
-export SINGULARITY_CACHEDIR="$SCRATCH_DIR/singularity"
-export NXF_SINGULARITY_CACHEDIR="$SCRATCH_DIR/.apptainer/cache"
+# Example: Using scratch space (recommended for HPC)
+export APPTAINER_TMPDIR="${VSC_SCRATCH_VO_USER}/.apptainer/tmp"
+export APPTAINER_CACHEDIR="${VSC_SCRATCH_VO_USER}/.apptainer/cache"
+export SINGULARITY_CACHEDIR="${VSC_SCRATCH_VO_USER}/singularity"
+export NXF_SINGULARITY_CACHEDIR="${VSC_SCRATCH_VO_USER}/.apptainer/cache"
 
 # Create cache directories
 mkdir -p "$APPTAINER_TMPDIR" "$APPTAINER_CACHEDIR" "$SINGULARITY_CACHEDIR"
-
-# Now run Nextflow
-nextflow run main.nf -profile local,singularity -params-file params.json
 ```
 
-### Why This Is Necessary
+**Why this is necessary**: Nextflow pulls container images before launching processes. The cache location must be configured in your shell environment (not just in configuration files) to take effect during image pulling.
 
-These environment variables must be set **before** running Nextflow because:
-1. Nextflow pulls container images **before** launching processes
-2. At image pull time, it uses the shell environment where the `nextflow` command runs
-3. Process-level environment variables (set in `conf/executors/*.config`) only apply to spawned processes, not to Nextflow's image pulling
+**For persistent configuration**, add these exports to your `~/.bashrc` or `~/.bash_profile`.
 
-### Customizing for Other HPC Systems
+### Using `slurm` Profile
 
-If your HPC uses different scratch directory environment variables:
-1. Modify the `SCRATCH_DIR` variable in generated job scripts
-2. Or set it manually before running Nextflow:
-   ```bash
-   export SCRATCH_DIR="/your/scratch/path"
-   ```
+When using the `slurm` profile, you need to:
+
+#### 1. Adjust Module Loading (if needed)
+
+Edit `conf/executors/slurm.config` to match your HPC's available modules. See the [HPC Module Configuration](#hpc-module-configuration) section above for details.
+
+#### 2. Configure Cache Directories (if using containers with SLURM)
+
+If your SLURM configuration uses containers, modify the `env` block in `conf/executors/slurm.config`:
+
+```groovy
+env {
+    APPTAINER_TMPDIR = "/your/scratch/path/.apptainer/tmp"
+    APPTAINER_CACHEDIR = "/your/scratch/path/.apptainer/cache"
+    SINGULARITY_CACHEDIR = "/your/scratch/path/singularity"
+    NXF_SINGULARITY_CACHEDIR = "/your/scratch/path/.apptainer/cache"
+    // ... other env variables
+}
+```
+
+Replace `/your/scratch/path` with your system's scratch directory path or environment variable (e.g., `"$scratch_dir/.apptainer/tmp"` if using the existing `scratch_dir` variable).
 
 ## Data Download (Zenodo)
 

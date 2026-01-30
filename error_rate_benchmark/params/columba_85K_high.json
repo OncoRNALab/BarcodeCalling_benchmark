@@ -1,0 +1,16 @@
+{
+    "comment": "Columba parameters for 85K barcodes, 36nt, high error rate",
+    "tool": "columba",
+    "barcode_file": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/85K_36nt/barcodes_85K_36_subset1",
+    "r1_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/85K_36nt/reads_85K_36_high_R1.fastq",
+    "r2_fastq": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/85K_36nt/reads_85K_36_high_R2.fastq",
+    "sample_id": "columba_85K_36nt_high",
+    "barcode_length": 36,
+    "outdir": "results/error_rate/columba_85K_36nt_high",
+    "ground_truth": "/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K/85K_36nt/answers_85K_36_high",
+    "comment_columba": "Columba-specific parameters",
+    "columba_repo": "/user/gent/446/vsc44685/ScratchVO_dir/columba",
+    "identity_threshold": 80,
+    "barcode_window": "0-36",
+    "cpus": 16
+}

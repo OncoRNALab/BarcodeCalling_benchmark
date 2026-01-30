@@ -139,6 +139,59 @@ withName: 'COLUMBA_BUILD' {
 
 **Note**: Job submission scripts also load `Nextflow/25.04.8` module. If your HPC uses a different module name or if Nextflow is already available, modify the generated job scripts accordingly.
 
+---
+
+## Singularity/Apptainer Cache Configuration
+
+### Avoiding Home Directory Disk Quota Issues
+
+By default, Singularity/Apptainer stores container images and temporary files in your home directory (`~/.apptainer/cache`), which can quickly exceed disk quotas when pulling large container images.
+
+**All generated job scripts automatically configure cache directories to use scratch space** by exporting these environment variables before running Nextflow:
+
+```bash
+SCRATCH_DIR="${VSC_SCRATCH_VO_USER:-${VSC_SCRATCH:-$HOME/scratch}}"
+export APPTAINER_TMPDIR="$SCRATCH_DIR/.apptainer/tmp"
+export APPTAINER_CACHEDIR="$SCRATCH_DIR/.apptainer/cache"
+export SINGULARITY_CACHEDIR="$SCRATCH_DIR/singularity"
+export NXF_SINGULARITY_CACHEDIR="$SCRATCH_DIR/.apptainer/cache"
+```
+
+### Manual Execution
+
+If you're running Nextflow commands manually (not using generated job scripts), **export these variables before running Nextflow**:
+
+```bash
+# Set cache directories to scratch
+SCRATCH_DIR="${VSC_SCRATCH_VO_USER:-${VSC_SCRATCH:-$HOME/scratch}}"
+export APPTAINER_TMPDIR="$SCRATCH_DIR/.apptainer/tmp"
+export APPTAINER_CACHEDIR="$SCRATCH_DIR/.apptainer/cache"
+export SINGULARITY_CACHEDIR="$SCRATCH_DIR/singularity"
+export NXF_SINGULARITY_CACHEDIR="$SCRATCH_DIR/.apptainer/cache"
+
+# Create cache directories
+mkdir -p "$APPTAINER_TMPDIR" "$APPTAINER_CACHEDIR" "$SINGULARITY_CACHEDIR"
+
+# Now run Nextflow
+nextflow run main.nf -profile local,singularity -params-file params.json
+```
+
+### Why This Is Necessary
+
+These environment variables must be set **before** running Nextflow because:
+1. Nextflow pulls container images **before** launching processes
+2. At image pull time, it uses the shell environment where the `nextflow` command runs
+3. Process-level environment variables (set in `conf/executors/*.config`) only apply to spawned processes, not to Nextflow's image pulling
+
+### Customizing for Other HPC Systems
+
+If your HPC uses different scratch directory environment variables:
+1. Modify the `SCRATCH_DIR` variable in generated job scripts
+2. Or set it manually before running Nextflow:
+   ```bash
+   export SCRATCH_DIR="/your/scratch/path"
+   ```
+
 ## Data Download (Zenodo)
 
 All benchmark datasets are deposited at **Zenodo DOI: [10.5281/zenodo.18387161](https://doi.org/10.5281/zenodo.18387161)**

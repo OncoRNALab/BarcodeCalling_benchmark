@@ -15,46 +15,104 @@ The benchmarks evaluate accuracy (precision/recall), runtime, and scalability ac
 - Multiple error regimes (low, medium, high)
 - Simulated and real sequencing data
 
+## Execution Profiles
+
+The pipeline supports two execution profiles that work with **all three tools** (QUIK, RandomBarcodes, Columba):
+
+### 1. `local,singularity` — Container-based execution
+- **Uses**: Singularity/Apptainer containers for all tools
+- **Recommended for**: Testing, reproducibility, systems without SLURM
+- **Requirements**: Singularity/Apptainer installed
+- **Advantages**: 
+  - No manual tool installation needed
+  - Consistent across different systems
+  - Pre-built containers from Quay.io
+- **Example**:
+  ```bash
+  nextflow run main.nf -profile local,singularity -params-file params.json
+  ```
+
+### 2. `slurm` — HPC cluster execution
+- **Uses**: SLURM scheduler with HPC modules
+- **Recommended for**: Production benchmarks on HPC clusters
+- **Requirements**: SLURM, HPC modules (CMake, CUDA, PyTorch, GCC)
+- **Advantages**:
+  - Optimized for HPC environments
+  - Better resource management for large jobs
+  - Uses system-provided CUDA/GPU libraries
+- **Example**:
+  ```bash
+  nextflow run main.nf -profile slurm -params-file params.json
+  ```
+
+---
+
 ## Software Requirements
 
 ### Essential
 - **Nextflow** ≥ 23.04 ([install guide](https://www.nextflow.io/docs/latest/getstarted.html))
-- **Singularity/Apptainer** (for local execution with containers)
-- **SLURM** (for HPC execution with modules)
 
-### Tool-Specific Requirements
+### Profile-Specific Requirements
+
+#### For `local,singularity` profile:
+- **Singularity/Apptainer** (any recent version)
+- **Sufficient disk space** for container cache (scratch space recommended)
+- All tool containers are automatically pulled from Quay.io
+
+#### For `slurm` profile:
+- **SLURM** scheduler
+- **HPC modules**: CMake, CUDA, PyTorch, GCC (see [HPC Module Configuration](#hpc-module-configuration))
+- **Manual Columba installation** (see below)
+
+### Tool-Specific Notes
 
 #### QUIK & RandomBarcodes
-- Conda environments provided in `envs/`
-- Containers available for Singularity execution
-- Nextflow handles dependency management automatically
+- **`local,singularity`**: Fully containerized, no setup needed
+- **`slurm`**: Compiled from source using HPC modules, no manual installation needed
 
 #### Columba
-**Two execution modes:**
-
-**1. Local execution with Singularity** (`-profile local,singularity`)
-- Uses pre-built container from Quay.io: `oras://quay.io/francoaps/columba_vanilla:latest`
-- **No manual installation required** - container is automatically pulled and cached
-- **No `columba_repo` parameter needed**
-- Container includes Columba 2.0.3 with all dependencies
-
-**2. HPC execution with SLURM** (`-profile slurm`)
-- Requires manual Columba installation
-- Clone and build Columba from source:
+- **`local,singularity`**: Uses pre-built container (`oras://quay.io/francoaps/columba_vanilla:latest`), no setup needed
+- **`slurm`**: Requires manual installation
   ```bash
   cd /path/to/your/software
   git clone https://github.com/biointec/columba.git
   cd columba
   bash build_script.sh Vanilla
   ```
-- **Must provide `columba_repo` parameter** in JSON files pointing to the cloned directory
-- Pipeline uses HPC modules (CMake/GCCcore) for compilation
+  Then provide `columba_repo` parameter in JSON files pointing to the cloned directory
 
 ---
 
-## HPC Module Configuration
+## Profile Setup and Configuration
 
-### Default Modules (UGent HPC - Joltik/Accelgor)
+### Setup for `local,singularity` Profile
+
+When using the `local,singularity` profile, you **must configure Apptainer/Singularity cache directories** to avoid home directory disk quota issues.
+
+**Before running Nextflow, export these variables** (adjust paths to directories with sufficient disk space):
+
+```bash
+# Example: Using scratch space (recommended for HPC)
+export APPTAINER_TMPDIR="${VSC_SCRATCH_VO_USER}/.apptainer/tmp"
+export APPTAINER_CACHEDIR="${VSC_SCRATCH_VO_USER}/.apptainer/cache"
+export SINGULARITY_CACHEDIR="${VSC_SCRATCH_VO_USER}/singularity"
+export NXF_SINGULARITY_CACHEDIR="${VSC_SCRATCH_VO_USER}/.apptainer/cache"
+
+# Create cache directories
+mkdir -p "$APPTAINER_TMPDIR" "$APPTAINER_CACHEDIR" "$SINGULARITY_CACHEDIR"
+```
+
+**Why this is necessary**: Nextflow pulls container images before launching processes. The cache location must be configured in your shell environment to take effect during image pulling.
+
+**For persistent configuration**, add these exports to your `~/.bashrc` or `~/.bash_profile`.
+
+---
+
+### Setup for `slurm` Profile
+
+#### HPC Module Configuration
+
+##### Default Modules (UGent HPC - Joltik/Accelgor)
 
 When using `-profile slurm`, the pipeline automatically loads the following HPC modules:
 
@@ -74,11 +132,11 @@ module load GCCcore/13.3.0               # For indexing and alignment
 - **CMake**: Required for compiling Columba
 - **GCCcore**: Provides g++ and build tools
 
-### Customizing for Your HPC System
+##### Customizing for Your HPC System
 
 If you're using a different HPC system, you'll need to modify the module names to match your environment:
 
-#### Step 1: Check Available Modules
+**Step 1: Check Available Modules**
 
 ```bash
 # List all available modules
@@ -91,7 +149,7 @@ module spider CUDA
 module spider GCC
 ```
 
-#### Step 2: Modify Configuration File
+**Step 2: Modify Configuration File**
 
 Edit `conf/executors/slurm.config` and update the module names:
 
@@ -113,7 +171,7 @@ withName: 'COLUMBA_ALIGN' {
 }
 ```
 
-#### Step 3: Required Software Versions
+**Step 3: Required Software Versions**
 
 Make sure your modules provide:
 - **CMake**: ≥ 3.20
@@ -121,7 +179,7 @@ Make sure your modules provide:
 - **PyTorch**: ≥ 2.0 with CUDA support
 - **GCC/g++**: ≥ 11.0 (for Columba)
 
-#### Alternative: Skip Module Loading
+**Alternative: Skip Module Loading**
 
 If your HPC doesn't use modules, or software is already in PATH, you can remove module loading:
 
@@ -138,55 +196,6 @@ withName: 'COLUMBA_BUILD' {
 ```
 
 **Note**: Job submission scripts also load `Nextflow/25.04.8` module. If your HPC uses a different module name or if Nextflow is already available, modify the generated job scripts accordingly.
-
----
-
-## Profile-Specific Configuration
-
-### Using `local,singularity` Profile
-
-When using the `local,singularity` profile, you **must export Apptainer/Singularity cache environment variables** to avoid home directory disk quota issues.
-
-**Before submitting jobs or running Nextflow, export these variables** (adjust paths to directories with sufficient disk space):
-
-```bash
-# Example: Using scratch space (recommended for HPC)
-export APPTAINER_TMPDIR="${VSC_SCRATCH_VO_USER}/.apptainer/tmp"
-export APPTAINER_CACHEDIR="${VSC_SCRATCH_VO_USER}/.apptainer/cache"
-export SINGULARITY_CACHEDIR="${VSC_SCRATCH_VO_USER}/singularity"
-export NXF_SINGULARITY_CACHEDIR="${VSC_SCRATCH_VO_USER}/.apptainer/cache"
-
-# Create cache directories
-mkdir -p "$APPTAINER_TMPDIR" "$APPTAINER_CACHEDIR" "$SINGULARITY_CACHEDIR"
-```
-
-**Why this is necessary**: Nextflow pulls container images before launching processes. The cache location must be configured in your shell environment (not just in configuration files) to take effect during image pulling.
-
-**For persistent configuration**, add these exports to your `~/.bashrc` or `~/.bash_profile`.
-
-### Using `slurm` Profile
-
-When using the `slurm` profile, you need to:
-
-#### 1. Adjust Module Loading (if needed)
-
-Edit `conf/executors/slurm.config` to match your HPC's available modules. See the [HPC Module Configuration](#hpc-module-configuration) section above for details.
-
-#### 2. Configure Cache Directories (if using containers with SLURM)
-
-If your SLURM configuration uses containers, modify the `env` block in `conf/executors/slurm.config`:
-
-```groovy
-env {
-    APPTAINER_TMPDIR = "/your/scratch/path/.apptainer/tmp"
-    APPTAINER_CACHEDIR = "/your/scratch/path/.apptainer/cache"
-    SINGULARITY_CACHEDIR = "/your/scratch/path/singularity"
-    NXF_SINGULARITY_CACHEDIR = "/your/scratch/path/.apptainer/cache"
-    // ... other env variables
-}
-```
-
-Replace `/your/scratch/path` with your system's scratch directory path or environment variable (e.g., `"$scratch_dir/.apptainer/tmp"` if using the existing `scratch_dir` variable).
 
 ## Data Download (Zenodo)
 
@@ -244,8 +253,8 @@ data/
 
 ### 1. Test the pipeline (single run)
 
+#### Example 1: QUIK with `local,singularity` profile
 ```bash
-# Example: Run QUIK on 21K 36nt barcodes
 nextflow run main.nf \
     --tool quik \
     --barcode_file data/benchmark_85K_42K_21K_200K/21K_36nt/barcodes_21K_36_subset1 \
@@ -255,6 +264,21 @@ nextflow run main.nf \
     --sample_id test_quik_21K \
     --strategy 4_mer_gpu_v4 \
     --rejection_threshold 8 \
+    --outdir results/test \
+    -profile local,singularity
+```
+
+#### Example 2: Columba with `slurm` profile
+```bash
+nextflow run main.nf \
+    --tool columba \
+    --barcode_file data/benchmark_85K_42K_21K_200K/21K_36nt/barcodes_21K_36_subset1 \
+    --r1_fastq data/benchmark_85K_42K_21K_200K/21K_36nt/reads_21K_36_low_R1.fastq \
+    --r2_fastq data/benchmark_85K_42K_21K_200K/21K_36nt/reads_21K_36_low_R2.fastq \
+    --ground_truth data/benchmark_85K_42K_21K_200K/21K_36nt/answers_21K_36_low \
+    --sample_id test_columba_21K \
+    --identity_threshold 72 \
+    --columba_repo /path/to/columba \
     --outdir results/test \
     -profile slurm
 ```
@@ -338,50 +362,7 @@ bash barcode_seq/submit_all_tools.sh
 
 ## Configuration
 
-### Profiles
-
-The pipeline supports two main execution modes:
-
-#### 1. Local execution with Singularity (`-profile local,singularity`)
-- Uses Singularity containers for all tools
-- **Recommended for testing and reproducibility**
-- Columba uses pre-built container (no `columba_repo` needed)
-- Example:
-  ```bash
-  nextflow run main.nf \
-      --tool columba \
-      --barcode_file data/barcodes.fasta \
-      --r1_fastq data/reads_R1.fastq \
-      --r2_fastq data/reads_R2.fastq \
-      --sample_id test_columba \
-      --identity_threshold 80 \
-      --outdir results/test \
-      -profile local,singularity
-  ```
-
-#### 2. HPC execution with SLURM (`-profile slurm`)
-- Uses SLURM scheduler with HPC modules
-- **Recommended for production benchmarks on HPC clusters**
-- Columba requires `columba_repo` parameter (path to cloned repository)
-- Example:
-  ```bash
-  nextflow run main.nf \
-      --tool columba \
-      --barcode_file data/barcodes.fasta \
-      --r1_fastq data/reads_R1.fastq \
-      --r2_fastq data/reads_R2.fastq \
-      --sample_id test_columba \
-      --identity_threshold 80 \
-      --columba_repo /path/to/columba \
-      --outdir results/test \
-      -profile slurm
-  ```
-
-**Note for Columba users:**
-- `local,singularity`: Container binaries used automatically (no setup needed)
-- `slurm`: Must download and provide `columba_repo` parameter (see Software Requirements)
-
-See `conf/` for detailed configuration options.
+For detailed configuration options, see `conf/README.md`.
 
 ### Customizing parameters
 

@@ -119,6 +119,9 @@ def generate_1M_scaling_benchmark(
             work_rel = f"work_1million_reads/{tool}/{bc_label}"
             logs_rel = "1million_reads/logs"
             
+            # Reports directory - use results_dir for consistency
+            reports_dir = f"{results_dir}/reports"
+            
             # Determine resource requirements
             if tool == 'columba':
                 time_limit = "12:00:00"
@@ -143,9 +146,9 @@ nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
     -profile slurm \\
-    -with-report 1M_scaling/reports/{job_name}_report.html \\
-    -with-timeline 1M_scaling/reports/{job_name}_timeline.html \\
-    -with-dag 1M_scaling/reports/{job_name}_dag.html
+    -with-report {reports_dir}/{job_name}_report.html \\
+    -with-timeline {reports_dir}/{job_name}_timeline.html \\
+    -with-dag {reports_dir}/{job_name}_dag.html
 """
             
             with open(job_file, 'w') as f:

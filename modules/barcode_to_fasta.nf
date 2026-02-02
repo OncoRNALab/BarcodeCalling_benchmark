@@ -4,7 +4,7 @@ process BARCODE_TO_FASTA {
     
     conda "${moduleDir}/../envs/python_basic.yml"
     
-    publishDir "${params.outdir}/${meta.id}/columba_prep", mode: 'copy'
+    publishDir "${params.outdir}/columba_prep", mode: 'copy'
     
     input:
     tuple val(meta), path(barcode_file)

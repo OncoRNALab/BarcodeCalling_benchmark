@@ -8,7 +8,7 @@ process COLUMBA_BUILD {
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
     container "oras://quay.io/francoaps/columba_vanilla:latest"
     
-    publishDir "${params.outdir}/columba_build", mode: 'copy'
+    // Do not publish columba_build outputs (binaries not needed in results)
     
     input:
     path columba_repo
@@ -90,7 +90,7 @@ process COLUMBA_INDEX {
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
     container "oras://quay.io/francoaps/columba_vanilla:latest"
     
-    publishDir "${params.outdir}/${meta.id}/columba_index", mode: 'copy'
+    publishDir "${params.outdir}/columba_index", mode: 'copy'
     
     input:
     tuple val(meta), path(barcode_fasta)
@@ -138,7 +138,7 @@ process COLUMBA_ALIGN {
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
     container "oras://quay.io/francoaps/columba_vanilla:latest"
     
-    publishDir "${params.outdir}/${meta.id}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
     
     input:
     tuple val(meta), path(reads), path(index_files)

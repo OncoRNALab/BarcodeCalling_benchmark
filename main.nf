@@ -236,7 +236,7 @@ workflow {
             RESULTS for sample: ${sample_meta.id}
             Tool: ${tool_name.toUpperCase()}
             ============================================
-            SAM alignment: ${params.outdir}/${sample_meta.id}/${sam.name}
+            SAM alignment: ${params.outdir}/${sam.name}
             ============================================
             """
         }
@@ -256,7 +256,7 @@ workflow {
     
     barcode_stats.view { sample_meta, stats ->
         """
-        Statistics file: ${params.outdir}/${sample_meta.id}/${stats.name}
+        Statistics file: ${params.outdir}/${stats.name}
         """
     }
 }

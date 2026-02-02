@@ -183,13 +183,13 @@ workflow {
             PRECISION METRICS for sample: ${sample_meta.id}
             Tool: ${tool_name.toUpperCase()}
             ============================================
-            Summary CSV: ${params.outdir}/${sample_meta.id}/${csv.name}
+            Summary CSV: ${params.outdir}/${csv.name}
             """
         }
         
         precision_report.view { sample_meta, report ->
             """
-            Detailed Report: ${params.outdir}/${sample_meta.id}/${report.name}
+            Detailed Report: ${params.outdir}/${report.name}
             ============================================
             """
         }

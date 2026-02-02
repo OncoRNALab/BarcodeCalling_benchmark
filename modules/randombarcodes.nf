@@ -19,7 +19,7 @@ process RANDOMBARCODES {
     // GPU count set to 1 (QUIK doesn't support multi-GPU)
 
     // Publish outputs to results directory
-    publishDir "${params.outdir}/${meta.id}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
     
     input:
     tuple val(meta), path(reads)

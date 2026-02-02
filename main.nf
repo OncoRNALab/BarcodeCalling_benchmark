@@ -210,19 +210,19 @@ workflow {
             ============================================
             BARCODE STATISTICS for sample: ${sample_meta.id}
             ============================================
-            Summary CSV: ${params.outdir}/${sample_meta.id}/${csv.name}
+            Summary CSV: ${params.outdir}/${csv.name}
             """
         }
         
         CALCULATE_BARCODE_STATISTICS.out.report.view { sample_meta, report ->
             """
-            Detailed Report: ${params.outdir}/${sample_meta.id}/${report.name}
+            Detailed Report: ${params.outdir}/${report.name}
             """
         }
         
         CALCULATE_BARCODE_STATISTICS.out.per_barcode.view { sample_meta, csv ->
             """
-            Per-barcode CSV: ${params.outdir}/${sample_meta.id}/${csv.name}
+            Per-barcode CSV: ${params.outdir}/${csv.name}
             ============================================
             """
         }
@@ -247,8 +247,8 @@ workflow {
             RESULTS for sample: ${sample_meta.id}
             Tool: ${tool_name.toUpperCase()}
             ============================================
-            Filtered R1: ${params.outdir}/${sample_meta.id}/${r1.name}
-            Filtered R2: ${params.outdir}/${sample_meta.id}/${r2.name}
+            Filtered R1: ${params.outdir}/${r1.name}
+            Filtered R2: ${params.outdir}/${r2.name}
             ============================================
             """
         }

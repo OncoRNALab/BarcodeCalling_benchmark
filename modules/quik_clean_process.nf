@@ -10,7 +10,7 @@ process QUIK_BARCODE_CALLING {
         'quay.io/francoaps/quik-cuda:latest' }"
 
     // Publish outputs to results directory
-    publishDir "${params.outdir}/${meta.id}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
 
     input:
     tuple val(meta), path(reads)

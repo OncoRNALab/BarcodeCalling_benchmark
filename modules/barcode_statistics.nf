@@ -4,7 +4,7 @@ process CALCULATE_BARCODE_STATISTICS {
 
     conda "${moduleDir}/../envs/python_basic.yml"
     
-    publishDir "${params.outdir}/${meta.id}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
 
     input:
     tuple val(meta), path(filtered_r1), path(filtered_r2)

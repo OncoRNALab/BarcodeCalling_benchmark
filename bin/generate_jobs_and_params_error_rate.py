@@ -120,6 +120,9 @@ def generate_error_rate_benchmark(
                 work_rel = f"work_error_rate/{tool}/{bc_label}_{error_rate}"
                 logs_rel = f"error_rate_benchmark/logs"
                 
+                # Reports directory - use results_dir for consistency
+                reports_dir = f"{results_dir}/reports"
+                
                 # Determine resource requirements
                 if tool == 'columba':
                     resources = f"#SBATCH --cpus-per-task={TOOLS[tool]['cpus']}\n#SBATCH --mem=16G"
@@ -142,9 +145,9 @@ nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
     -profile slurm \\
-    -with-report error_rate_benchmark/reports/{job_name}_report.html \\
-    -with-timeline error_rate_benchmark/reports/{job_name}_timeline.html \\
-    -with-dag error_rate_benchmark/reports/{job_name}_dag.html
+    -with-report {reports_dir}/{job_name}_report.html \\
+    -with-timeline {reports_dir}/{job_name}_timeline.html \\
+    -with-dag {reports_dir}/{job_name}_dag.html
 """
                 
                 with open(job_file, 'w') as f:

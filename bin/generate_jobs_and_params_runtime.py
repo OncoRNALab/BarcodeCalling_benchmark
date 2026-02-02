@@ -126,6 +126,9 @@ def generate_runtime_benchmark(
             work_rel = f"work_runtime/{tool}/{config_name}"
             logs_rel = f"runtime_benchmarks/{tool}/logs"
             
+            # Reports directory - use results_dir for consistency
+            reports_dir = f"{results_dir}/reports"
+            
             job_content = f"""#!/bin/bash
 #SBATCH -J {job_name}
 #SBATCH --ntasks=1
@@ -142,9 +145,9 @@ nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
     -profile slurm \\
-    -with-report runtime_benchmarks/reports/{job_name}_report.html \\
-    -with-timeline runtime_benchmarks/reports/{job_name}_timeline.html \\
-    -with-dag runtime_benchmarks/reports/{job_name}_dag.html
+    -with-report {reports_dir}/{job_name}_report.html \\
+    -with-timeline {reports_dir}/{job_name}_timeline.html \\
+    -with-dag {reports_dir}/{job_name}_dag.html
 """
             
             with open(job_file, 'w') as f:

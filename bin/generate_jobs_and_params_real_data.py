@@ -47,22 +47,22 @@ def generate_real_data_benchmark(
             'count': 21476,
             'r1': 'Munchen_25024_1in4_S4_L001_R1_001.fastq.gz',
             'r2': 'Munchen_25024_1in4_S4_L001_R2_001.fastq.gz',
-            'real_barcodes': 'Realbar_1in4_column_major_lower.txt',
-            'decoy_barcodes': 'Decoybar_1in4_column_major_lower.txt'
+            'real_barcodes': 'Realbar_1in4_column_major.txt',
+            'decoy_barcodes': 'Decoybar_1in4_column_major.txt'
         },
         '42k': {
             'count': 42653,
             'r1': 'Munchen_25024_1in2_S1_L001_R1_001.fastq.gz',
             'r2': 'Munchen_25024_1in2_S1_L001_R2_001.fastq.gz',
-            'real_barcodes': 'Realbar_1in2_column_major_lower.txt',
-            'decoy_barcodes': 'Decoybar_1in2_column_major_lower.txt'
+            'real_barcodes': 'Realbar_1in2_column_major.txt',
+            'decoy_barcodes': 'Decoybar_1in2_column_major.txt'
         },
         '85k': {
             'count': 85305,
             'r1': 'Munchen_25024_1in1_S2_L001_R1_001.fastq.gz',
             'r2': 'Munchen_25024_1in1_S2_L001_R2_001.fastq.gz',
-            'real_barcodes': 'Realbar_1in1_column_major_lower.txt',
-            'decoy_barcodes': 'Decoybar_1in1_column_major_lower.txt'
+            'real_barcodes': 'Realbar_1in1_column_major.txt',
+            'decoy_barcodes': 'Decoybar_1in1_column_major.txt'
         }
     }
     
@@ -148,9 +148,12 @@ def generate_real_data_benchmark(
                 job_file = tool_dir / 'jobs' / f"job_{array_label}{'_decoy' if run_type == 'decoy' else ''}.sh"
                 
                 # Relative paths from project root
-                params_rel = f"barcode_seq/{tool}/params/params_{array_label}{'_decoy' if run_type == 'decoy' else ''}.json"
+                params_rel = f"real_data/{tool}/params/params_{array_label}{'_decoy' if run_type == 'decoy' else ''}.json"
                 work_rel = f"work_real_data/{tool}/{array_label}_{run_type}"
-                logs_rel = f"barcode_seq/{tool}/logs"
+                logs_rel = f"real_data/{tool}/logs"
+                
+                # Reports directory - use results_dir for consistency
+                reports_dir = f"{results_dir}/reports"
                 
                 # Determine resource requirements
                 if tool == 'columba':
@@ -176,9 +179,9 @@ nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
     -profile slurm \\
-    -with-report real_data/reports/{job_name}_report.html \\
-    -with-timeline real_data/reports/{job_name}_timeline.html \\
-    -with-dag real_data/reports/{job_name}_dag.html
+    -with-report {reports_dir}/{job_name}_report.html \\
+    -with-timeline {reports_dir}/{job_name}_timeline.html \\
+    -with-dag {reports_dir}/{job_name}_dag.html
 """
                 
                 with open(job_file, 'w') as f:
@@ -245,8 +248,8 @@ def main():
     parser.add_argument(
         '--output-dir',
         type=Path,
-        default=Path(__file__).parent.parent / 'barcode_seq',
-        help='Output directory for jobs/params (default: barcode_seq/)'
+        default=Path(__file__).parent.parent / 'real_data',
+        help='Output directory for jobs/params (default: real_data/)'
     )
     parser.add_argument(
         '--results-dir',

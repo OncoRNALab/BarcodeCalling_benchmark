@@ -99,6 +99,9 @@ def generate_parameter_sweep(
             work_rel = f"work_sweep_rb_{barcode_length}nt/t{ntriage}_n{nthresh}"
             logs_rel = f"parameter_sweeps/{barcode_length}nt/randombarcodes/logs"
             
+            # Reports directory - use results_dir for consistency
+            reports_dir = f"{results_dir}/results_{barcode_length}nt/reports"
+            
             job_content = f"""#!/bin/bash
 #SBATCH -J {job_name}
 #SBATCH --ntasks=1
@@ -118,9 +121,9 @@ nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
     -profile slurm \\
-    -with-report parameter_sweeps/{barcode_length}nt/reports/{job_name}_report.html \\
-    -with-timeline parameter_sweeps/{barcode_length}nt/reports/{job_name}_timeline.html \\
-    -with-dag parameter_sweeps/{barcode_length}nt/reports/{job_name}_dag.html
+    -with-report {reports_dir}/{job_name}_report.html \\
+    -with-timeline {reports_dir}/{job_name}_timeline.html \\
+    -with-dag {reports_dir}/{job_name}_dag.html
 """
             
             with open(job_file, 'w') as f:
@@ -169,6 +172,9 @@ nextflow run main.nf \\
             work_rel = f"work_sweep_quik_{barcode_length}nt/{strat_short}mer_r{r}"
             logs_rel = f"parameter_sweeps/{barcode_length}nt/quik/logs"
             
+            # Reports directory - use results_dir for consistency
+            reports_dir = f"{results_dir}/results_{barcode_length}nt/reports"
+            
             job_content = f"""#!/bin/bash
 #SBATCH -J {job_name}
 #SBATCH --ntasks=1
@@ -188,9 +194,9 @@ nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
     -profile slurm \\
-    -with-report parameter_sweeps/{barcode_length}nt/reports/{job_name}_report.html \\
-    -with-timeline parameter_sweeps/{barcode_length}nt/reports/{job_name}_timeline.html \\
-    -with-dag parameter_sweeps/{barcode_length}nt/reports/{job_name}_dag.html
+    -with-report {reports_dir}/{job_name}_report.html \\
+    -with-timeline {reports_dir}/{job_name}_timeline.html \\
+    -with-dag {reports_dir}/{job_name}_dag.html
 """
             
             with open(job_file, 'w') as f:
@@ -236,6 +242,9 @@ nextflow run main.nf \\
         work_rel = f"work_sweep_columba_{barcode_length}nt/I{identity_thresh}"
         logs_rel = f"parameter_sweeps/{barcode_length}nt/columba/logs"
         
+        # Reports directory - use results_dir for consistency
+        reports_dir = f"{results_dir}/results_{barcode_length}nt/reports"
+        
         job_content = f"""#!/bin/bash
 #SBATCH -J {job_name}
 #SBATCH --ntasks=1
@@ -253,9 +262,9 @@ nextflow run main.nf \\
     -params-file {params_rel} \\
     -work-dir {work_rel} \\
     -profile slurm \\
-    -with-report parameter_sweeps/{barcode_length}nt/reports/{job_name}_report.html \\
-    -with-timeline parameter_sweeps/{barcode_length}nt/reports/{job_name}_timeline.html \\
-    -with-dag parameter_sweeps/{barcode_length}nt/reports/{job_name}_dag.html
+    -with-report {reports_dir}/{job_name}_report.html \\
+    -with-timeline {reports_dir}/{job_name}_timeline.html \\
+    -with-dag {reports_dir}/{job_name}_dag.html
 """
         
         with open(job_file, 'w') as f:

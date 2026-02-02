@@ -36,11 +36,48 @@ This guide provides step-by-step instructions to download data, generate jobs, a
 
 All benchmark datasets are available on Zenodo. Download the following archives:
 
-###  1. Error Rate & 1M Scaling Benchmarks
+### 1. Synthetic Benchmark Data (200K reads)
+
+**Dataset**: `benchmark_85K_42K_21K_200K.tar.gz`  
+**Zenodo DOI**: [INSERT_DOI_HERE]  
+**Size**: ~XX GB
+
+**Used for**:
+- Error Rate Benchmark
+- Parameter Sweep Benchmark (all barcode lengths: 28, 30, 32, 34, 36nt)
+- Runtime Benchmark
+
+```bash
+# Download
+wget https://zenodo.org/record/[RECORD_ID]/files/benchmark_85K_42K_21K_200K.tar.gz
+
+# Extract
+tar -xzf benchmark_85K_42K_21K_200K.tar.gz
+
+# Expected directory structure:
+# benchmark_85K_42K_21K_200K/
+# ├── 21K_28nt/
+# ├── 21K_30nt/
+# ├── 21K_32nt/
+# ├── 21K_34nt/
+# ├── 21K_36nt/
+# ├── 42K_36nt/
+# └── 85K_36nt/
+```
+
+**Location for scripts**:
+```bash
+DATA_DIR=/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K
+```
+
+### 2. Synthetic Benchmark Data (1M reads)
 
 **Dataset**: `benchmark_85K_42K_21K.tar.gz`  
 **Zenodo DOI**: [INSERT_DOI_HERE]  
 **Size**: ~XX GB
+
+**Used for**:
+- 1 Million Reads Scaling Benchmark ONLY
 
 ```bash
 # Download
@@ -61,53 +98,38 @@ tar -xzf benchmark_85K_42K_21K.tar.gz
 DATA_DIR=/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K
 ```
 
-### 2. Parameter Sweep Benchmarks
-
-**Dataset**: `benchmark_parameter_sweeps.tar.gz`  
-**Zenodo DOI**: [INSERT_DOI_HERE]  
-**Size**: ~XX GB
-
-```bash
-# Download
-wget https://zenodo.org/record/[RECORD_ID]/files/benchmark_parameter_sweeps.tar.gz
-
-# Extract
-tar -xzf benchmark_parameter_sweeps.tar.gz
-
-# Expected directory structure:
-# benchmark_parameter_sweeps/
-# ├── 21K_28nt/
-# ├── 21K_30nt/
-# ├── 21K_32nt/
-# ├── 21K_34nt/
-# └── 21K_36nt/
-```
-
-**Location for scripts**:
-```bash
-DATA_DIR=/user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_parameter_sweeps
-```
-
 ### 3. Real Data Benchmarks
 
 #### 3a. FASTQ Files
 
-**Datasets**: Real sequencing data  
+**Datasets**: Real BCseq sequencing data  
 **Zenodo DOI**: [INSERT_DOI_HERE]  
 **Size**: ~XX GB
+
+**Arrays**:
+- 21k barcodes: `Munchen_25024_1in4_S4_L001` (1 in 4 array)
+- 42k barcodes: `Munchen_25024_1in2_S1_L001` (1 in 2 array)
+- 85k barcodes: `Munchen_25024_1in1_S2_L001` (1 in 1 array)
 
 ```bash
 # Create directory
 mkdir -p real_data_files
 
-# Download all FASTQ.gz files
+# Download all FASTQ.gz files (R1 and R2 for each array)
 cd real_data_files
+
+# 21k array (1in4)
 wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25024_1in4_S4_L001_R1_001.fastq.gz
 wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25024_1in4_S4_L001_R2_001.fastq.gz
-wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25025_1in20_S5_L001_R1_001.fastq.gz
-wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25025_1in20_S5_L001_R2_001.fastq.gz
-wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25026_4in1_S6_L001_R1_001.fastq.gz
-wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25026_4in1_S6_L001_R2_001.fastq.gz
+
+# 42k array (1in2)
+wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25024_1in2_S1_L001_R1_001.fastq.gz
+wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25024_1in2_S1_L001_R2_001.fastq.gz
+
+# 85k array (1in1)
+wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25024_1in1_S2_L001_R1_001.fastq.gz
+wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25024_1in1_S2_L001_R2_001.fastq.gz
+
 cd ..
 ```
 
@@ -131,12 +153,12 @@ tar -xzf BCseq_barcodes.tar.gz
 
 # Expected structure:
 # BCseq_barcodes/
-# ├── Realbar_1in4_column_major.txt
-# ├── Realbar_1in20_column_major.txt
-# ├── Realbar_4in1_column_major.txt
-# ├── Decoybar_1in4_column_major.txt
-# ├── Decoybar_1in20_column_major.txt
-# └── Decoybar_4in1_column_major.txt
+# ├── Realbar_1in4_column_major.txt   (21k array - real barcodes)
+# ├── Realbar_1in2_column_major.txt   (42k array - real barcodes)
+# ├── Realbar_1in1_column_major.txt   (85k array - real barcodes)
+# ├── Decoybar_1in4_column_major.txt  (21k array - decoy barcodes)
+# ├── Decoybar_1in2_column_major.txt  (42k array - decoy barcodes)
+# └── Decoybar_1in1_column_major.txt  (85k array - decoy barcodes)
 ```
 
 **Location for scripts**:
@@ -154,11 +176,13 @@ All generation scripts are located in `bin/` and create SLURM job files and para
 
 **Purpose**: Test tools across 3 barcode counts × 3 error rates (27 experiments, 200K reads each)
 
+**Data Required**: `benchmark_85K_42K_21K_200K.tar.gz`
+
 ```bash
 cd BarCall_benchmark
 
 python3 bin/generate_jobs_and_params_error_rate.py \
-    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K \
+    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K \
     --output-dir error_rate_benchmark \
     --results-dir results/error_rate_benchmark
 ```
@@ -192,11 +216,13 @@ python3 bin/generate_jobs_and_params_1M_scaling.py \
 
 **Purpose**: Test performance across different read counts (9 experiments per tool)
 
+**Data Required**: `benchmark_85K_42K_21K_200K.tar.gz`
+
 ```bash
 cd BarCall_benchmark
 
 python3 bin/generate_jobs_and_params_runtime.py \
-    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K \
+    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K \
     --output-dir runtime_benchmarks \
     --results-dir results/runtime_benchmark
 ```
@@ -211,11 +237,13 @@ python3 bin/generate_jobs_and_params_runtime.py \
 
 **Purpose**: Test tools across parameter ranges for 5 barcode lengths (28, 30, 32, 34, 36nt)
 
+**Data Required**: `benchmark_85K_42K_21K_200K.tar.gz` (same as error rate benchmark)
+
 ```bash
 cd BarCall_benchmark
 
 python3 bin/generate_jobs_and_params_parameter_sweep.py \
-    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_parameter_sweeps \
+    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K \
     --output-dir parameter_sweeps \
     --results-dir results/parameter_sweep
 ```
@@ -459,30 +487,37 @@ ls -la results/error_rate_benchmark/
 
 ```bash
 # 1. Download data (see Data Download section)
+# Required:
+# - benchmark_85K_42K_21K_200K.tar.gz (for error rate, runtime, parameter sweep)
+# - benchmark_85K_42K_21K.tar.gz (for 1M scaling only)
+# - BCseq_barcodes.tar.gz + real FASTQ files (for real data)
 
 # 2. Generate all jobs
 cd BarCall_benchmark
 
+# Error rate, runtime, and parameter sweep use 200K data
 python3 bin/generate_jobs_and_params_error_rate.py \
-    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K \
+    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K \
     --output-dir error_rate_benchmark \
     --results-dir results/error_rate_benchmark
 
+python3 bin/generate_jobs_and_params_runtime.py \
+    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K \
+    --output-dir runtime_benchmarks \
+    --results-dir results/runtime_benchmark
+
+python3 bin/generate_jobs_and_params_parameter_sweep.py \
+    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K_200K \
+    --output-dir parameter_sweeps \
+    --results-dir results/parameter_sweep
+
+# 1M scaling uses 1M data
 python3 bin/generate_jobs_and_params_1M_scaling.py \
     --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K \
     --output-dir 1million_reads \
     --results-dir results/scaling_1M_benchmark
 
-python3 bin/generate_jobs_and_params_runtime.py \
-    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_85K_42K_21K \
-    --output-dir runtime_benchmarks \
-    --results-dir results/runtime_benchmark
-
-python3 bin/generate_jobs_and_params_parameter_sweep.py \
-    --data-dir /user/gent/446/vsc44685/DataVO_dir/RandomBarcodes/outputs/benchmark_parameter_sweeps \
-    --output-dir parameter_sweeps \
-    --results-dir results/parameter_sweep
-
+# Real data uses real FASTQ files
 python3 bin/generate_jobs_and_params_real_data.py \
     --data-dir /user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/real_data_files \
     --barcode-dir /user/gent/446/vsc44685/ScratchVO_dir/barcalling_review/BCseq_barcodes \

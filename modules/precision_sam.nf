@@ -4,7 +4,7 @@ process CALCULATE_PRECISION_SAM {
 
     conda "${moduleDir}/../envs/python_basic.yml"
     
-    publishDir "${params.outdir}/${meta.id}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
 
     input:
     tuple val(meta), path(sam_file)

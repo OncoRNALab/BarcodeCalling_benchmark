@@ -7,7 +7,7 @@ process CALCULATE_BARCODE_STATISTICS {
     publishDir "${params.outdir}", mode: 'copy'
 
     input:
-    tuple val(meta), path(filtered_r1), path(filtered_r2)
+    tuple val(meta), path(filtered_r1), path(filtered_r2), path(barcode_file), path(original_r1), path(original_r2)
     
     output:
     tuple val(meta), path("${meta.id}_stats_report.txt"), emit: report
@@ -20,7 +20,7 @@ process CALCULATE_BARCODE_STATISTICS {
     
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def barcode_file = meta.barcode_file
+    // barcode_file is now a path input, not from meta
     
     """
     calculate_barcode_stats.py \\
@@ -29,6 +29,7 @@ process CALCULATE_BARCODE_STATISTICS {
         ${prefix}_stats_report.txt \\
         ${prefix}_stats_summary.csv \\
         ${prefix}_per_barcode.csv \\
+        --original-fastq ${original_r1} \\
         --verbose
     
     cat <<-END_VERSIONS > versions.yml

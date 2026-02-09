@@ -130,7 +130,7 @@ wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25024_1in2_S1_L001_R2_0
 wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25024_1in1_S2_L001_R1_001.fastq.gz
 wget https://zenodo.org/record/[RECORD_ID]/files/Munchen_25024_1in1_S2_L001_R2_001.fastq.gz
 
-cd ..
+§cd ..
 ```
 
 **Location for scripts**:

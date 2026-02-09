@@ -104,10 +104,11 @@ workflow {
         barcode_window: params.barcode_window
     ]
     
-    // Create input channel with tuple val(meta), path(reads)
+    // Create input channel with tuple val(meta), path(reads), path(barcode_file)
     input_ch = Channel.of([
         meta,
-        [file(params.r1_fastq), file(params.r2_fastq)]
+        [file(params.r1_fastq), file(params.r2_fastq)],
+        file(params.barcode_file)
     ])
     
     // Run the selected barcode calling tool
@@ -127,7 +128,7 @@ workflow {
         log.info "Running Columba barcode calling..."
         
         // Step 1: Convert plain text barcodes to FASTA
-        barcode_ch = input_ch.map { m, reads -> [m, file(m.barcode_file)] }
+        barcode_ch = input_ch.map { m, reads, barcode_file -> [m, barcode_file] }
         BARCODE_TO_FASTA(barcode_ch)
         
         // Step 2: Build Columba (if needed) or use existing binaries
@@ -142,7 +143,9 @@ workflow {
         COLUMBA_INDEX(BARCODE_TO_FASTA.out.fasta, COLUMBA_BUILD.out.binaries)
         
         // Step 4: Run alignment
-        columba_input = input_ch.join(COLUMBA_INDEX.out.index)
+        // Remove barcode_file from channel before joining with index (Columba doesn't need it for alignment)
+        columba_input_ch = input_ch.map { m, reads, barcode_file -> [m, reads] }
+        columba_input = columba_input_ch.join(COLUMBA_INDEX.out.index)
         COLUMBA_ALIGN(columba_input, COLUMBA_BUILD.out.binaries)
         
         // Columba outputs SAM instead of filtered FASTQ
@@ -160,16 +163,28 @@ workflow {
         
         if (tool_name == 'columba') {
             // Use SAM-specific precision calculation for Columba
+            // Add barcode file to columba_output: [meta, sam] -> [meta, sam, barcode_file]
+            columba_precision_input = columba_output
+                .map { m, sam -> tuple(m.id, m, sam) }
+                .join(input_ch.map { m, reads, bf -> tuple(m.id, bf) })
+                .map { id, m, sam, bf -> tuple(m, sam, bf) }
+            
             CALCULATE_PRECISION_SAM(
-                columba_output,
+                columba_precision_input,
                 ground_truth_ch
             )
             precision_summary = CALCULATE_PRECISION_SAM.out.summary
             precision_report = CALCULATE_PRECISION_SAM.out.report
         } else {
             // Use standard FASTQ-based precision calculation for QUIK/RandomBarcodes
+            // Add barcode file to barcode_results: [meta, R1, R2] -> [meta, R1, R2, barcode_file]
+            precision_input = barcode_results
+                .map { m, r1, r2 -> tuple(m.id, m, r1, r2) }
+                .join(input_ch.map { m, reads, bf -> tuple(m.id, bf) })
+                .map { id, m, r1, r2, bf -> tuple(m, r1, r2, bf) }
+            
             CALCULATE_PRECISION(
-                barcode_results,
+                precision_input,
                 ground_truth_ch
             )
             precision_summary = CALCULATE_PRECISION.out.summary
@@ -202,7 +217,16 @@ workflow {
     if (tool_name != 'columba' && barcode_results != null) {
         log.info "Calculating barcode assignment statistics..."
         
-        CALCULATE_BARCODE_STATISTICS(barcode_results)
+        // Add barcode file and original reads to barcode_results for statistics calculation
+        // barcode_results: [meta, filtered_R1, filtered_R2]
+        // input_ch: [meta, [original_R1, original_R2], barcode_file]
+        // We need: [meta, filtered_R1, filtered_R2, barcode_file, original_R1, original_R2]
+        barcode_stats_input = barcode_results
+            .map { m, filt_r1, filt_r2 -> tuple(m.id, m, filt_r1, filt_r2) }
+            .join(input_ch.map { m, orig_reads, bf -> tuple(m.id, bf, orig_reads[0], orig_reads[1]) })
+            .map { id, m, filt_r1, filt_r2, bf, orig_r1, orig_r2 -> tuple(m, filt_r1, filt_r2, bf, orig_r1, orig_r2) }
+        
+        CALCULATE_BARCODE_STATISTICS(barcode_stats_input)
         
         // Display statistics results
         CALCULATE_BARCODE_STATISTICS.out.summary.view { sample_meta, csv ->

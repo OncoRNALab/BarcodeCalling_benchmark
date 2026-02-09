@@ -7,7 +7,7 @@ process CALCULATE_PRECISION {
     publishDir "${params.outdir}", mode: 'copy'
 
     input:
-    tuple val(meta), path(filtered_r1), path(filtered_r2)
+    tuple val(meta), path(filtered_r1), path(filtered_r2), path(barcode_file)
     path ground_truth
     
     output:
@@ -20,7 +20,7 @@ process CALCULATE_PRECISION {
     
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def barcode_file = meta.barcode_file
+    // barcode_file is now a path input, not from meta
     
     """
     calculate_precision.py \\

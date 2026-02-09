@@ -22,7 +22,7 @@ process RANDOMBARCODES {
     publishDir "${params.outdir}", mode: 'copy'
     
     input:
-    tuple val(meta), path(reads)
+    tuple val(meta), path(reads), path(barcode_file)
     
     output:
     tuple val(meta), path("${meta.id}_R1_filtered.fastq"), path("${meta.id}_R2_filtered.fastq"), emit: filtered_reads
@@ -37,7 +37,7 @@ process RANDOMBARCODES {
     def prefix = task.ext.prefix ?: "${meta.id}"
     
     // Extract parameters from meta map
-    def barcode_file = meta.barcode_file
+    // barcode_file is now a path input, not from meta
     def barcode_start = meta.barcode_start ?: 0
     def barcode_length = meta.barcode_length ?: meta.len_barcode ?: 28
     def n_barcodes = meta.n_barcodes ?: 21000

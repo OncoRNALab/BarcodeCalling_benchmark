@@ -18,8 +18,18 @@ import json
 def open_file(filename):
     """Open regular or gzipped file."""
     if filename.endswith('.gz'):
-        return gzip.open(filename, 'rt')
-    return open(filename, 'r')
+        return gzip.open(filename, 'rt', encoding='utf-8', errors='replace')
+    return open(filename, 'r', encoding='utf-8', errors='replace')
+
+
+def count_fastq_reads(fastq_file):
+    """Count total number of reads in a FASTQ file."""
+    read_count = 0
+    with open_file(fastq_file) as f:
+        for line_num, line in enumerate(f, 1):
+            if line_num % 4 == 1:  # Header line
+                read_count += 1
+    return read_count
 
 
 def load_barcodes(barcode_file):
@@ -260,10 +270,20 @@ def main():
     # Parse FASTQ assignments
     if args.verbose:
         print(f"Parsing barcode assignments from {args.fastq_r1}...")
-    assignments, total_reads = parse_fastq_assignments(args.fastq_r1, barcodes)
+    assignments, filtered_read_count = parse_fastq_assignments(args.fastq_r1, barcodes)
+    
+    # Count total reads from original FASTQ if provided, otherwise use filtered count
+    if args.original_fastq:
+        if args.verbose:
+            print(f"Counting total reads from original FASTQ: {args.original_fastq}...")
+        total_reads = count_fastq_reads(args.original_fastq)
+    else:
+        # Fall back to using filtered read count (may give 100% assignment rate)
+        total_reads = filtered_read_count
+    
     if args.verbose:
-        print(f"  Total reads: {total_reads}")
-        print(f"  Assigned reads: {len(assignments)}")
+        print(f"  Total reads (input): {total_reads}")
+        print(f"  Assigned reads (output): {len(assignments)}")
     
     # Calculate statistics
     if args.verbose:

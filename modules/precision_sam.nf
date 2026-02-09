@@ -7,7 +7,7 @@ process CALCULATE_PRECISION_SAM {
     publishDir "${params.outdir}", mode: 'copy'
 
     input:
-    tuple val(meta), path(sam_file)
+    tuple val(meta), path(sam_file), path(barcode_file)
     path ground_truth
     
     output:
@@ -20,7 +20,7 @@ process CALCULATE_PRECISION_SAM {
     
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def barcode_file = meta.barcode_file
+    // barcode_file is now a path input, not from meta
     def identity_threshold = meta.identity_threshold ?: 72
     
     """

@@ -17,11 +17,16 @@ work-*/
 
 # Benchmark outputs (large / regenerated)
 **/results*/
+./results
+./results/*
+*benchmark*
+*sweep
 **/logs*/
 **/*.out
 **/*.err
 
 # Large sequencing/alignment files
+./data
 **/*.sam
 **/*.bam
 **/*.fastq

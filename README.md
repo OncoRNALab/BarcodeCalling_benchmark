@@ -71,7 +71,7 @@ The pipeline supports two execution profiles that work with **all three tools** 
 - **`slurm`**: Compiled from source using HPC modules, no manual installation needed
 
 #### Columba
-- **`local,singularity`**: Uses pre-built container (`oras://quay.io/francoaps/columba_vanilla:latest`), no setup needed
+- **`local,singularity`**: Fully containerized, no setup needed
 - **`slurm`**: Requires manual installation
   ```bash
   cd /path/to/your/software
@@ -215,7 +215,12 @@ tar -xzf data/benchmark_200K.tar.gz -C data/
 wget https://zenodo.org/record/18387161/files/benchmark_85K_42K_21K.tar.gz -O data/benchmark_1M.tar.gz
 tar -xzf data/benchmark_1M.tar.gz -C data/
 
-# Download real sequencing data
+# Download real data barcodes (for real data benchmark)
+wget https://zenodo.org/records/18387161/files/BCseq_barcodes.tar.gz -O data/BCseq_barcodes.tar.gz
+tar -xzf data/BCseq_barcodes.tar.gz -C data/
+# This creates: data/BCseq_barcodes/ containing real and decoy barcode files
+
+# Download real sequencing data FASTQ files
 cd data/
 wget https://zenodo.org/record/18387161/files/Munchen_25024_1in4_S4_L001_R1_001.fastq.gz
 wget https://zenodo.org/record/18387161/files/Munchen_25024_1in4_S4_L001_R2_001.fastq.gz
@@ -224,8 +229,6 @@ wget https://zenodo.org/record/18387161/files/Munchen_25024_1in2_S1_L001_R2_001.
 wget https://zenodo.org/record/18387161/files/Munchen_25024_1in1_S2_L001_R1_001.fastq.gz
 wget https://zenodo.org/record/18387161/files/Munchen_25024_1in1_S2_L001_R2_001.fastq.gz
 cd ..
-
-# (Optional) Download barcode references for real data if not included in benchmark archives
 ```
 
 ### Expected directory structure after extraction
@@ -246,7 +249,14 @@ data/
 │   ├── 21K_36nt/
 │   ├── 42K_36nt/
 │   └── 85K_36nt/
-└── Munchen_*.fastq.gz              # Real sequencing data
+├── BCseq_barcodes/                 # Real data barcodes (real and decoy)
+│   ├── Realbar_1in1_column_major.txt   # 85K array barcodes
+│   ├── Realbar_1in2_column_major.txt   # 42K array barcodes
+│   ├── Realbar_1in4_column_major.txt   # 21K array barcodes
+│   ├── Decoybar_1in1_column_major.txt  # 85K decoy barcodes
+│   ├── Decoybar_1in2_column_major.txt  # 42K decoy barcodes
+│   └── Decoybar_1in4_column_major.txt  # 21K decoy barcodes
+└── Munchen_*.fastq.gz              # Real sequencing data FASTQ files
 ```
 
 ## Quick Start
@@ -347,13 +357,37 @@ python3 bin/generate_jobs_and_params_parameter_sweep.py \
 bash parameter_sweeps/submit_all_parameter_sweeps.sh
 ```
 
+### Barcode Count Sweep (library size effects)
+
+```bash
+# 1. Generate jobs and params
+# For SLURM profile (specify Columba installation path)
+python3 bin/generate_jobs_and_params_barcode_count.py \
+    --data-dir data/benchmark_85K_42K_21K_200K \
+    --output-dir parameter_sweeps_barcode_count \
+    --results-dir results/barcode_count_sweep \
+    --columba-repo /path/to/columba
+
+# For Singularity profile (no --columba-repo needed)
+python3 bin/generate_jobs_and_params_barcode_count.py \
+    --data-dir data/benchmark_85K_42K_21K_200K \
+    --output-dir parameter_sweeps_barcode_count \
+    --results-dir results/barcode_count_sweep
+
+# 2. Submit jobs (example for 21K 28nt)
+for job in parameter_sweeps_barcode_count/randombarcodes/21K_28nt/jobs/*.sh; do sbatch "$job"; done
+for job in parameter_sweeps_barcode_count/quik/21K_28nt/jobs/*.sh; do sbatch "$job"; done
+for job in parameter_sweeps_barcode_count/columba/21K_28nt/jobs/*.sh; do sbatch "$job"; done
+# Submit all combinations (21K, 42K, 85K × 28nt, 36nt)
+```
+
 ### Real Data Benchmark (photolithographic arrays)
 
 ```bash
 # 1. Generate jobs and params
 python3 bin/generate_jobs_and_params_real_data.py \
     --data-dir data/ \
-    --barcode-dir /path/to/real_and_decoy_barcodes \
+    --barcode-dir data/BCseq_barcodes \
     --results-dir results/real_data
 
 # 2. Submit all jobs
@@ -379,12 +413,13 @@ Edit the generator scripts in `bin/` to change:
 ## Analysis
 
 Jupyter notebooks for analyzing benchmark results are provided in `notebooks/`:
-- `error_rate_benchmark_200K.ipynb`: Error-rate analysis
+- `errorrate_benchmark_200K.ipynb`: Error-rate analysis
 - `Fullset_benchmark_1M.ipynb`: 1M scaling analysis
-- `barcode_count_sweep_analysis.ipynb`: Barcode library size effects
-- `parameter_sweep_analysis_*.ipynb`: Parameter calibration
-- `real_data_comparison.ipynb`: Real data results and overlap analysis
 - `runtime_analysis.ipynb`: Runtime/scaling analysis
+- `precision_recall_curves_28_36nt.ipynb`: Parameter sweep analysis (28/36nt)
+- `parameter_sweep_analysis_30_32_34nt.ipynb`: Parameter sweep analysis (30/32/34nt)
+- `barcode_count_sweep_analysis.ipynb`: Barcode library size effects
+- `real_data_comparison.ipynb`: Real data results and overlap analysis
 
 Tables and figures from the manuscript are exported to `notebooks/tables/` and `notebooks/figures/`.
 
@@ -419,6 +454,7 @@ BarCall_benchmark/
 ├── 1million_reads/                    # 1M scaling jobs/params (generated)
 ├── runtime_benchmarks/                # Runtime jobs/params (generated)
 ├── parameter_sweeps/                  # Parameter sweep jobs/params (generated)
+├── parameter_sweeps_barcode_count/    # Barcode count sweep jobs/params (generated)
 ├── barcode_seq/                       # Real-data jobs/params (generated)
 └── notebooks/                         # Jupyter analysis notebooks
 ```
@@ -430,4 +466,4 @@ Individual tools retain their original licenses.
 
 ## Contact
 
-For questions or issues: [franco.pomasoto@ugent.be](mailto:franco.pomasoto@ugent.be)
+For questions or issues: [francoalexander.pomasoto@ugent.be](mailto:francoalexander.pomasoto@ugent.be)

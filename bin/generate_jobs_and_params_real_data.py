@@ -38,7 +38,7 @@ def generate_real_data_benchmark(
                 '42k': 80,
                 '85k': 80
             },
-            'cpus': 32
+            'cpus': 8
         }
     }
     

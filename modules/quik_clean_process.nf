@@ -80,11 +80,28 @@ process QUIK_BARCODE_CALLING {
     echo "Making executable..."
     chmod +x single_strategy_benchmark_fastq_paired
     
+    # Decompress FASTQ files if gzipped (QUIK doesn't handle .gz natively)
+    if [[ ${reads[0]} == *.gz ]]; then
+        echo "Decompressing R1 FASTQ..."
+        gunzip -c ${reads[0]} > R1_decompressed.fastq
+        R1_INPUT=R1_decompressed.fastq
+    else
+        R1_INPUT=${reads[0]}
+    fi
+    
+    if [[ ${reads[1]} == *.gz ]]; then
+        echo "Decompressing R2 FASTQ..."
+        gunzip -c ${reads[1]} > R2_decompressed.fastq
+        R2_INPUT=R2_decompressed.fastq
+    else
+        R2_INPUT=${reads[1]}
+    fi
+    
     # Run quik_clean barcode calling using the built executable
     ./single_strategy_benchmark_fastq_paired \\
         ${barcode_file} \\
-        ${reads[0]} \\
-        ${reads[1]} \\
+        \$R1_INPUT \\
+        \$R2_INPUT \\
         ${barcode_start} \\
         ${barcode_length} \\
         ${strategy} \\
@@ -93,6 +110,9 @@ process QUIK_BARCODE_CALLING {
         ${prefix}_R1_filtered.fastq \\
         ${prefix}_R2_filtered.fastq \\
         > ${prefix}_barcode_calling_stats.txt 2>&1
+    
+    # Clean up decompressed files
+    rm -f R1_decompressed.fastq R2_decompressed.fastq
     
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -25,8 +25,7 @@ This directory contains Jupyter notebooks for analyzing benchmark results.
 - **Data required**: `parameter_sweeps_barcode_count/` results
 
 ### 4. Parameter Calibration (Threshold Sweeps)
-**`parameter_sweep_28nt_analysis.ipynb`**  
-**`parameter_sweep_36nt_analysis.ipynb`**  
+**`precision_recall_curves_28_36nt.ipynb`**
 **`parameter_sweep_analysis_30_32_34nt.ipynb`**
 - Precision-recall trade-off curves for each tool
 - Optimal operating-point selection

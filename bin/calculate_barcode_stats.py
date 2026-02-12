@@ -255,6 +255,7 @@ def main():
     parser.add_argument('output_report', help='Output text report file')
     parser.add_argument('output_summary', help='Output summary CSV file')
     parser.add_argument('output_per_barcode', help='Output per-barcode CSV file')
+    parser.add_argument('--original-fastq', help='Original input FASTQ file (for accurate total read count)')
     parser.add_argument('--verbose', action='store_true', help='Print verbose output')
     
     args = parser.parse_args()

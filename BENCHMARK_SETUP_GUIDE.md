@@ -45,6 +45,7 @@ All benchmark datasets are available on Zenodo. Download the following archives:
 **Used for**:
 - Error Rate Benchmark
 - Parameter Sweep Benchmark (all barcode lengths: 28, 30, 32, 34, 36nt)
+- Barcode Count Sweep Benchmark (21K, 42K, 85K barcodes at 28nt and 36nt)
 - Runtime Benchmark
 
 ```bash
@@ -254,7 +255,50 @@ python3 bin/generate_jobs_and_params_parameter_sweep.py \
 - Results will go to: `results/parameter_sweep/results_{length}nt/`
 - Reports will go to: `results/parameter_sweep/results_{length}nt/reports/`
 
-### 5. Real Data Benchmark
+### 5. Barcode Count Sweep Benchmark
+
+**Purpose**: Test the effect of barcode library size on tool performance (18 experiments: 3 counts × 2 lengths × 3 tools, all with parameter sweeps)
+
+**Data Required**: `benchmark_85K_42K_21K_200K.tar.gz` (same as error rate benchmark)
+
+**Tests**:
+- Barcode counts: 21K, 42K, 85K
+- Barcode lengths: 28nt, 36nt
+- All with 200K reads (low error rate)
+- Each combination sweeps tool-specific parameters
+
+```bash
+cd BarCall_benchmark
+
+# For slurm profile (requires Columba installation path)
+python3 bin/generate_jobs_and_params_barcode_count.py \
+    --data-dir data/benchmark_85K_42K_21K_200K \
+    --output-dir parameter_sweeps_barcode_count \
+    --results-dir results/barcode_count_sweep \
+    --columba-repo /path/to/your/columba
+
+# For singularity profile (no --columba-repo needed)
+python3 bin/generate_jobs_and_params_barcode_count.py \
+    --data-dir data/benchmark_85K_42K_21K_200K \
+    --output-dir parameter_sweeps_barcode_count \
+    --results-dir results/barcode_count_sweep
+```
+
+**Output**:
+- Jobs: `parameter_sweeps_barcode_count/{tool}/{count}_{length}/jobs/*.sh`
+  - Example: `parameter_sweeps_barcode_count/randombarcodes/21K_28nt/jobs/job_t100_n5.sh`
+- Params: `parameter_sweeps_barcode_count/{tool}/{count}_{length}/params/*.json`
+- Results will go to: `results/barcode_count_sweep/{tool}/{count}_{length}/`
+- Reports will go to: `results/barcode_count_sweep/reports/{tool}/{count}_{length}/`
+
+**Parameter Sweeps**:
+- **RandomBarcodes**: ntriage=100, nthresh=[5,6,7,8,9] (5 jobs per combination)
+- **QUIK**: strategy=4_mer_gpu_v4, rejection_threshold=[5,6,7,8,9,10] (6 jobs per combination)
+- **Columba**: identity_threshold=[77,78,79,80,81,82,83] (7 jobs per combination)
+
+**Total Jobs**: 108 (6 combinations × 18 jobs per combination)
+
+### 6. Real Data Benchmark
 
 **Purpose**: Test tools on real sequencing data (18 experiments: 3 arrays × 2 barcode sets × 3 tools)
 
@@ -337,6 +381,7 @@ All analysis notebooks are in the `notebooks/` directory and are configured to l
 | `runtime_analysis.ipynb` | Runtime | `results/runtime_benchmark` | Analyze computational performance |
 | `precision_recall_curves_28_36nt.ipynb` | Parameter Sweep | `results/parameter_sweep` | Precision-recall curves for 28/36nt |
 | `parameter_sweep_analysis_30_32_34nt.ipynb` | Parameter Sweep | `results/parameter_sweep` | Performance analysis for 30/32/34nt |
+| `barcode_count_sweep_analysis.ipynb` | Barcode Count | `results/barcode_count_sweep` | Analyze effect of barcode library size |
 | `real_data_comparison.ipynb` | Real Data | `results/real_data` | Compare tools on real data |
 
 ### Run a Notebook

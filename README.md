@@ -1,4 +1,4 @@
-# BarCall_benchmark: Barcode Calling Benchmark Pipeline
+# DNA barcode calling benchmark pipeline
 
 Reproducible benchmarking workflow for evaluating DNA barcode calling tools under high error rates.
 
@@ -413,13 +413,13 @@ Edit the generator scripts in `bin/` to change:
 ## Analysis
 
 Jupyter notebooks for analyzing benchmark results are provided in `notebooks/`:
-- `errorrate_benchmark_200K.ipynb`: Error-rate analysis
-- `Fullset_benchmark_1M.ipynb`: 1M scaling analysis
-- `runtime_analysis.ipynb`: Runtime/scaling analysis
-- `precision_recall_curves_28_36nt.ipynb`: Parameter sweep analysis (28/36nt)
-- `parameter_sweep_analysis_30_32_34nt.ipynb`: Parameter sweep analysis (30/32/34nt)
-- `barcode_count_sweep_analysis.ipynb`: Barcode library size effects
-- `real_data_comparison.ipynb`: Real data results and overlap analysis
+- `01_precision_recall_curves_28_36nt.ipynb`: Parameter sweep analysis (28/36nt)
+- `02_parameter_sweep_analysis_30_32_34nt.ipynb`: Parameter sweep analysis (30/32/34nt)
+- `03_runtime_analysis.ipynb`: Runtime/scaling analysis
+- `04_barcode_count_sweep_analysis.ipynb`: Barcode library size effects
+- `05_scaling_1M.ipynb`: 1M scaling analysis
+- `06_errorrate_benchmark_200K.ipynb`: Error-rate analysis
+- `07_real_data_comparison.ipynb`: Real data results and overlap analysis
 
 Tables and figures from the manuscript are exported to `notebooks/tables/` and `notebooks/figures/`.
 
@@ -433,37 +433,61 @@ DOI: 10.5281/zenodo.18387161
 ```
 
 Original tool papers:
-- **RandomBarcodes**: Press WH. (2022). PNAS Nexus, 1(5):pgac252
-- **QUIK**: Uphoff RC et al. (2026). [publication details]
-- **Columba**: Renders L et al. (2024). Bioinformatics
+- **RandomBarcodes**: Press, William H. 2022. “Fast Trimer Statistics Facilitate Accurate Decoding of Large Random DNA Barcode Sets Even at Large Sequencing Error Rates.” PNAS Nexus 1 (5): pgac252. https://doi.org/10.1093/pnasnexus/pgac252.
+
+- **QUIK**: Uphoff, Riko Corwin, Steffen Schüler, Ivo Grosse, and Matthias Müller-Hannemann. 2025. “Fast Barcode Calling Based on K-Mer Distances.” Preprint, bioRxiv, May 17. https://doi.org/10.1101/2025.05.12.653416.
+- **Columba**: Renders, Luca, Lore Depuydt, Travis Gagie, and Jan Fostier. 2025. “Columba: Fast Approximate Pattern Matching with Optimized Search Schemes.” Bioinformatics 41 (12): btaf652. https://doi.org/10.1093/bioinformatics/btaf652.
+
 
 ## Project Structure
 
 ```
 BarCall_benchmark/
 ├── bin/                               # Generator scripts and helper utilities
-│   ├── generate_jobs_and_params_*.py  # Benchmark generators
-│   ├── calculate_precision*.py         # Metric calculation scripts
+│   ├── generate_jobs_and_params_error_rate.py
+│   ├── generate_jobs_and_params_1M_scaling.py
+│   ├── generate_jobs_and_params_runtime.py
+│   ├── generate_jobs_and_params_parameter_sweep.py
+│   ├── generate_jobs_and_params_barcode_count.py
+│   ├── generate_jobs_and_params_real_data.py
+│   ├── calculate_barcode_stats.py    # Barcode assignment statistics
+│   ├── calculate_precision*.py        # Precision/recall metric scripts
 │   └── quik/                          # QUIK source code
+├── conf/                              # Nextflow configuration files
+│   ├── base.config                    # Base configuration
+│   ├── executors/                     # SLURM/local executor configs
+│   └── institutional/                 # Institution-specific configs
+├── docs/                              # Extended documentation
 ├── envs/                              # Conda environment YML files
 ├── modules/                           # Nextflow process modules
-├── conf/                              # Nextflow configuration
-├── docs/                              # Extended documentation
+│   ├── randombarcodes.nf
+│   ├── quik_clean_process.nf
+│   ├── columba.nf
+│   ├── barcode_statistics.nf
+│   └── precision_*.nf
+├── notebooks/                         # Jupyter analysis notebooks (01-07)
+├── util_scripts/                      # Utility scripts for data processing
 ├── main.nf                            # Main Nextflow workflow
-├── error_rate_benchmark/              # Error-rate jobs/params (generated)
-├── 1million_reads/                    # 1M scaling jobs/params (generated)
-├── runtime_benchmarks/                # Runtime jobs/params (generated)
-├── parameter_sweeps/                  # Parameter sweep jobs/params (generated)
-├── parameter_sweeps_barcode_count/    # Barcode count sweep jobs/params (generated)
-├── barcode_seq/                       # Real-data jobs/params (generated)
-└── notebooks/                         # Jupyter analysis notebooks
+├── nextflow.config                    # Nextflow configuration
+├── README.md                          # This file
+└── BENCHMARK_SETUP_GUIDE.md           # Detailed setup instructions
+
+Generated directories (created by generator scripts):
+├── error_rate_benchmark/              # Error-rate jobs/params
+├── 1million_reads/                    # 1M scaling jobs/params
+├── runtime_benchmarks/                # Runtime jobs/params
+├── parameter_sweeps/                  # Parameter sweep jobs/params (28-36nt)
+├── parameter_sweeps_barcode_count/    # Barcode count sweep jobs/params
+├── real_data/                         # Real-data jobs/params
+├── results/                           # Benchmark results (gitignored)
+└── work_*/                            # Nextflow work directories (gitignored)
 ```
 
 ## License
 
-This benchmarking pipeline is released under [license TBD].  
-Individual tools retain their original licenses.
+This benchmarking pipeline is released under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Contact
-
-For questions or issues: [francoalexander.pomasoto@ugent.be](mailto:francoalexander.pomasoto@ugent.be)
+Individual tools retain their original licenses:
+- **RandomBarcodes**: See original publication (Press 2022)
+- **QUIK**: See original repository
+- **Columba**: See original repository (Renders et al. 2024)

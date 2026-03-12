@@ -6,8 +6,8 @@ process QUIK_BARCODE_CALLING {
     // Container definitions (nf-core style)
     conda "${moduleDir}/../envs/quik_minimal.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://quay.io/francoaps/quik-cuda:latest' :
-        'quay.io/francoaps/quik-cuda:latest' }"
+        'or as://registry-1.docker.io/francops1722/quik_cuda:latest' :
+        'francops1722/quik_cuda:latest' }"
 
     // Publish outputs to results directory
     publishDir "${params.outdir}", mode: 'copy'

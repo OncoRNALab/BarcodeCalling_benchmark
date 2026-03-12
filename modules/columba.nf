@@ -3,10 +3,12 @@
 process COLUMBA_BUILD {
     tag "columba_build"
     label 'process_medium'
-    
-    // Container for local,singularity profile (pulled from Quay.io registry)
+
     // On SLURM: overridden to null, uses HPC modules instead (see conf/executors/slurm.config)
-    container "oras://quay.io/francoaps/columba_vanilla:latest"
+    //container "oras://quay.io/francoaps/columba_vanilla:latest"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'or as://registry-1.docker.io/francops1722/columba_build:latest' :
+        'francops1722/columba_build:latest' }"
     
     // Do not publish columba_build outputs (binaries not needed in results)
     
